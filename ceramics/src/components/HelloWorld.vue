@@ -5,7 +5,7 @@
 </template>
 
 <script>
-import Register from './Register'
+import Register from './assembly/Register'
 export default {
   name: 'HelloWorld',
   data () {
