@@ -15,10 +15,12 @@
       </div>
       <img class="userInfo" src="../../assets/user.png" @click="personCenter" />
     </div>
+    <Register v-if="item" @login="login"></Register>
   </div>
 </template>
 
 <script>
+import Register from '../assembly/Register.vue'
 export default {
   name: 'headpage',
   data () {
@@ -27,11 +29,19 @@ export default {
     }
   },
   methods: {
+    login () {
+      this.item = false
+    },
     backToHome () {
       this.$router.push('/')
     },
     personCenter () {
-      this.$router.push('/PersonalCenter')
+      let token = JSON.parse(localStorage.getItem('token'))
+      if (token === null) {
+        this.item = true
+      } else {
+        this.$router.push('/PersonalCenter')
+      }
     },
     menuShow (ev) {
       if (ev.path[1].children[1].style.display === 'none' || ev.path[1].children[1].style.display === '') {
@@ -55,6 +65,17 @@ export default {
         ev.path[1].style.transition = 'background 1s'
       }
     }
+  },
+  components: {
+    Register
+  },
+  props: {
+    item: {
+      type: Boolean,
+      default () {
+        return false
+      }
+    }
   }
 }
 </script>
@@ -68,6 +89,7 @@ export default {
   background: #fff;
   top: 0;
   left: 0;
+  z-index: 9;
   img {
     width: 30px;
     cursor: pointer;

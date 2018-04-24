@@ -28,6 +28,7 @@ export default {
         alert('请输入密码')
       } else {
         if (this.user.indexOf('@') === -1) {
+          // this.passwordAndConfirm()
           if (!(/^1(3|4|5|7|8)\d{9}$/.test(this.user))) {
             alert('手机号码有误，请重填')
           } else {
@@ -43,21 +44,19 @@ export default {
       }
     },
     passwordAndConfirm () {
-      if (this.password === this.confirmPassword) {
-        let that = this
-        let config = { headers: { 'Content-Type': 'multipart/form-data' } }
-        that.$http.post('http://www.temaxd.com/Hooott/userLogin.cz?account=' + this.user + '&password=' + this.password, {}, config).then(res => {
-          let status = JSON.parse(res.data)
-          // console.log(status[1].MESSAGE)
-          if (status[0].CODE === '200') {
-            alert(status[1].MESSAGE)
-          } else {
-            alert(status[1].MESSAGE)
-          }
-        })
-      } else {
-        alert('两次输入不一致')
-      }
+      let that = this
+      let config = { headers: { 'Content-Type': 'multipart/form-data' } }
+      that.$http.post('http://www.temaxd.com/Hooott/userLogin.cz?account=' + this.user + '&password=' + this.password, {}, config).then(res => {
+        let status = JSON.parse(res.data)
+        console.log(status)
+        if (status[0].CODE === '200') {
+          // alert(status[1].MESSAGE)
+          this.$emit('loginSuccess')
+          localStorage.setItem('token', JSON.stringify(status[2].userId))
+        } else {
+          alert(status[1].MESSAGE)
+        }
+      })
     },
     toRegister () {
       this.$emit('userRegister')

@@ -13,7 +13,7 @@
       </div>
     </div>
     <div class="popup" v-show="login">
-      <login @userRegister="backToRegister" @forGet="forgetPass"></login>
+      <login @userRegister="backToRegister" @forGet="forgetPass" @loginSuccess="successLogin"></login>
     </div>
     <div class="popup" v-show="forget">
       <ForgetPassword @confirm="showLogin"></ForgetPassword>
@@ -37,6 +37,9 @@ export default {
     }
   },
   methods: {
+    successLogin () {
+      this.$emit('login')
+    },
     // 用户注册
     userRegister () {
       // console.log(this.userPhone, this.password)
