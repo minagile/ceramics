@@ -2,12 +2,12 @@
   <div class="head-page">
     <div class="menu">
       <img src="../../assets/menu.png" @click="menuShow($event)" />
-      <div class="menu-list">
+      <div class="menu-list" v-show="isMenuShow">
         <span class="arrow"></span>
-        <div v-for="(item, index) in menuList" :key="index"><router-link :to="item.link">{{ item.name }}</router-link></div>
+        <div v-for="(item, index) in menuList" @click="link" :key="index"><router-link :to="item.link">{{ item.name }}</router-link></div>
       </div>
     </div>
-    <div class="title"><span @click="backToHome">HOOOT.T</span></div>
+    <div class="title" @click="backToHome"><span>HOOOT.T</span></div>
     <div class="user">
       <div class="search">
         <input type="text" placeholder="" />
@@ -25,17 +25,23 @@ export default {
   name: 'headpage',
   data () {
     return {
-      menuList: [{name: '关于我们', link: '/aboutus'}, {name: '服务条款', link: '/serverterms'}]
+      menuList: [{name: '关于我们', link: '/aboutus'}, {name: '服务条款', link: '/serverterms'}],
+      isMenuShow: false
     }
   },
   methods: {
+    link () {
+      this.isMenuShow = false
+    },
     login () {
       this.item = false
     },
     backToHome () {
       this.$router.push('/')
+      this.isMenuShow = false
     },
     personCenter () {
+      this.isMenuShow = false
       let token = JSON.parse(localStorage.getItem('token'))
       if (token === null) {
         this.item = true
@@ -44,6 +50,7 @@ export default {
       }
     },
     menuShow (ev) {
+      this.isMenuShow = true
       if (ev.path[1].children[1].style.display === 'none' || ev.path[1].children[1].style.display === '') {
         ev.path[1].children[1].style.display = 'block'
       } else {

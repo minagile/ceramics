@@ -2,9 +2,17 @@
   <div class="personal-center">
     <head-page></head-page>
     <div class="personal">
+      <div class="back_to_homepage">
+        <router-link to="/">返回首页</router-link>
+      </div>
       <div class="personal-info">
         <div class="img">
           <img  :src="avatar" />
+          <input type="file"
+            name="avatar"
+            accept="image/gif,image/jpeg,image/jpg,image/png"
+            @change="changeImage($event)"
+            ref="avatarInput" />
         </div>
         <div class="set-up l" @click="setUp">设置</div>
         <div class="sigin-out l" @click="userOut">退出账号</div>
@@ -34,21 +42,26 @@
           </div>
         </div>
         <!-- 个人设置 -->
-        <div class="set-up-show" v-if="isSetUpShow">
+        <div class="set-up-show" v-show="isSetUpShow">
           <div class="border"></div>
           <h2>账户修改</h2>
           <div class="modify">
             <div class="tit">电子邮箱</div>
-            <div class="email"><input type="email" placeholder="Email" v-model="email" /></div>
+            <div class="email">
+              <input type="email" placeholder="Email" v-model="email" />
+              <!-- 发送验证码 -->
+              <img src="../assets/send.png" @click="sendCode" />
+              <input type="text" placeholder="填写验证码" v-model="correctCode" />
+            </div>
+            <!-- <div class="tit">手机号</div>
+            <div class="nickname"><input type="text" placeholder="手机号" v-model="nickname" /></div> -->
             <div class="tit">密码</div>
             <div class="password"><button @click="changePassword">更改密码</button></div>
             <div class="tit">性别</div>
-            <div class="sex">
-              <input type="radio" name="sex" checked/>男
-              <input type="radio" name="sex" />女
+            <div class="sex" @change="sexChange($event)" id="sex">
+              <input type="radio" name="sex" v-model="sex" value="男" />男
+              <input type="radio" name="sex" v-model="sex" value="女" />女
             </div>
-            <!-- <div class="tit">昵称</div>
-            <div class="nickname"><input type="text" placeholder="昵称" v-model="nickname" /></div> -->
             <div class="tit">头像</div>
             <div class="head-portrait">
               <img :src="avatar" />
@@ -144,7 +157,10 @@ export default {
       imgList: [],
       row: 4,
       email: '',
-      nickname: ''
+      nickname: '',
+      sex: '男',
+      correctCode: '',
+      getCode: ''
     }
   },
   mounted () {
@@ -153,7 +169,27 @@ export default {
     document.getElementById('list_item').style.width = this.row * 221 + 'px'
   },
   methods: {
-    // 保存修改
+    // 发送验证码
+    sendCode () {
+      let that = this
+      let config = { headers: { 'Content-Type': 'multipart/form-data' } }
+      if (!(/^[A-Za-z0-9\u4e00-\u9fa5]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/.test(this.email))) {
+        alert('邮箱有误，请重填')
+      } else {
+        that.$http.post('http://www.temaxd.com/Hooott/sendEmail.cz?email=' + this.email, {}, config).then(res => {
+          let status = JSON.parse(res.data)
+          console.log(status[1].RAND)
+          // this.timeOut = true
+          // this.countDown(60, ev.path[0])
+          this.getCode = status[1].RAND
+        })
+      }
+    },
+    // 修改性别
+    sexChange (ev) {
+      this.sex = ev.path[0].value
+    },
+    // 保存修改设置
     saveChange () {
       let that = this
       let config = { emulateJSON: true }
@@ -167,19 +203,24 @@ export default {
       } else {
         this.user.userPhone = this.user.userPhone
       }
-      that.$http.post('http://www.temaxd.com/Hooott/updateUserInfo.cz', {
-        userEmail: this.email,
-        userPhone: this.user.userPhone,
-        userSex: '男',
-        userId: JSON.parse(localStorage.getItem('token'))
-      }, config).then(res => {
-        console.log(res.data)
-        history.go(0)
-      })
+      if (this.getCode === this.correctCode) {
+        that.$http.post('http://www.temaxd.com/Hooott/updateUserInfo.cz', {
+          userEmail: this.email,
+          userPhone: this.user.userPhone,
+          userSex: this.sex,
+          userId: JSON.parse(localStorage.getItem('token'))
+        }, config).then(res => {
+          console.log(res.data)
+          history.go(0)
+        })
+      } else {
+        alert('验证码错误')
+      }
     },
     back () {
       this.isPictureShow = false
     },
+    // 展示文件夹里的图片
     showFolderImages (id, name) {
       this.isPictureShow = true
       this.imgList = []
@@ -205,6 +246,7 @@ export default {
         }
       })
     },
+    // 获取收藏的数据
     getCollectionData () {
       let that = this
       that.$http.get('http://www.temaxd.com/Hooott/folderUserAll.cz', {
@@ -298,6 +340,7 @@ export default {
         console.log(err)
       })
     },
+    // 获取个人信息
     getInfoData () {
       let that = this
       that.$http.get('http://www.temaxd.com/Hooott/getUser.cz', {
@@ -308,12 +351,13 @@ export default {
         console.log(JSON.parse(res.data))
         this.user = JSON.parse(res.data)
         this.email = this.user.userEmail
+        this.avatar = this.user.userAvatar
+        this.sex = this.user.userSex
       })
     },
     // 上传头像
     changeImage (e) {
       var file = e.target.files[0]
-      console.log(file)
       var reader = new FileReader()
       var that = this
       reader.onload = function (e) {
@@ -325,17 +369,21 @@ export default {
         this.user.userAvatar = 0
       }
       image.append('file', file)
-      image.append('oldAvatar', this.user.userAvatar)
-      image.append('ossType', file.type.split('/')[1])
-      image.append('userId', this.user.userId)
-      console.log(image)
-      that.$http.post('http://www.temaxd.com/Hooott/avatarUser.cz', image, {
+      that.$http.post('http://www.temaxd.com/Hooott/uploadUserOss.cz', image, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
       }).then(res => {
-        console.log(res)
-        this.getInfoData()
+        that.$http.post('http://www.temaxd.com/Hooott/avatarUser.cz', {
+          oldAvatar: this.user.userAvatar,
+          ossType: file.type.split('/')[1],
+          userId: this.user.userId,
+          userAvatar: JSON.parse(res.data).userAvatar
+        }, { emulateJSON: true }).then(res => {
+          console.log(res)
+          this.getInfoData()
+        })
+        // this.getInfoData()
       })
     },
     // 设置
@@ -354,6 +402,7 @@ export default {
     cancel () {
       this.createShow = false
     },
+    // 创建新收藏夹
     build () {
       let that = this
       that.$http.get('http://www.temaxd.com/Hooott/addFolder.cz', {
@@ -389,6 +438,7 @@ export default {
       this.newCollection = false
       this.isChangePass = true
     },
+    // 确认修改
     confirmChange () {
       let that = this
       let config = { headers: { 'Content-Type': 'multipart/form-data' } }
@@ -438,11 +488,22 @@ export default {
     border: 1px solid #ccc;
     border-radius: 50%;
     cursor: pointer;
+    position: relative;
     img {
       width: 100%;
       min-height: 100%;
       border-radius: 50%;
       display: block;
+    }
+    input {
+      width: 100%;
+      height: 100%;
+      // background: rgba(234, 23, 234, 0.3);
+      opacity: 0;
+      position: absolute;
+      top: 0;
+      left: 0;
+      cursor: pointer;
     }
   }
   .l {
@@ -567,8 +628,15 @@ export default {
           color: #888;
           font-size: 14px;
           border-radius: 6px;
-          text-indent: 4px;
+          text-indent: 10px;
           outline: none;
+        }
+        img {
+          width: 30px;
+          position: relative;
+          top: 10px;
+          margin-left: 20px;
+          cursor: pointer;
         }
       }
       .password {

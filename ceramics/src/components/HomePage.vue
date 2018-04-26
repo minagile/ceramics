@@ -2,15 +2,16 @@
   <div class="home-page">
     <head-page :item="hasToken"></head-page>
     <div class="first-page" id="items" >
-      <WaterFull :Images="data" :row="row" :picWidth="246" @imgId="imgId" />
+      <!-- <WaterFull :Images="data" :row="row" :picWidth="246" @imgId="imgId" /> -->
+      <WaterFull :Images="data" :row="row" :picWidth="246" />
       <!-- <div class="popup" v-for="(item, index) in data" :key="index" ref="imgList">
         <img :src="'https://spider-x.oss-cn-shanghai.aliyuncs.com/CeramicCard/' + item.ossImage.split('[')[1].split(']')[0]" />
         <div class="cover" @click="imgLevel(item.id)"></div>
       </div> -->
     </div>
-    <div class="two_level" v-if="isLevelShow">
+    <!-- <div class="two_level" v-if="isLevelShow">
       <TwoPageLevel :id="id" @levelClose="levelClose"/>
-    </div>
+    </div> -->
   </div>
 </template>
 

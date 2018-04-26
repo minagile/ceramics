@@ -27,7 +27,11 @@ export default {
   },
   methods: {
     imgLevel (id) {
-      this.$emit('imgId', id)
+      // this.$emit('imgId', id)
+      this.$router.push({
+        name: 'TwoLevelPage',
+        params: {id: id}
+      })
     },
     getData (data) {
       // console.log(data)
