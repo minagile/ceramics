@@ -3,64 +3,82 @@
     <head-page></head-page>
     <div class="personal">
       <div class="personal-info">
-        <div class="img"></div>
+        <div class="img">
+          <img  :src="avatar" />
+        </div>
         <div class="set-up l" @click="setUp">设置</div>
         <div class="sigin-out l" @click="userOut">退出账号</div>
       </div>
       <div class="right">
-        <div class="first-enter" v-if="!isSetUpShow">
+        <!-- 文件夹 -->
+        <div class="first-enter" v-if="!isSetUpShow" v-show="!isPictureShow">
           <div class="create-new r">
             <div class="pic" @click="createNewItem">
               <img src="../assets/add.png" alt="">
             </div>
             <span>创建新收藏</span>
           </div>
-          <div class="folder r">
-            <div class="pic"></div>
-            <span>作品名</span>
-          </div>
-          <div class="folder r">
-            <div class="pic"></div>
-            <span>作品名</span>
+          <div class="folder r" v-for="(item, index) in collectionList" :key="index" @click="showFolderImages(item.folderId, item.folderName)">
+            <div class="pic" :style="{'background-image': 'url(' + item.ossImage + ')'}"></div>
+            <span>{{ item.folderName }}</span>
           </div>
         </div>
+        <!-- 收藏夹中的图片 -->
+        <div class="images" v-show="isPictureShow">
+          <div class="name">
+            <img src="../assets/back.png" alt="" @click="back">
+            {{ foldName }}
+          </div>
+          <div id="list_item" class="img-list">
+            <WaterFull :Images="imgList" :row="row" :picWidth="181" />
+          </div>
+        </div>
+        <!-- 个人设置 -->
         <div class="set-up-show" v-if="isSetUpShow">
           <div class="border"></div>
           <h2>账户修改</h2>
           <div class="modify">
             <div class="tit">电子邮箱</div>
-            <div class="email"><input type="email" placeholder="Email" /></div>
+            <div class="email"><input type="email" placeholder="Email" v-model="email" /></div>
             <div class="tit">密码</div>
             <div class="password"><button @click="changePassword">更改密码</button></div>
             <div class="tit">性别</div>
             <div class="sex">
-              <input type="radio" name="sex" />男
+              <input type="radio" name="sex" checked/>男
               <input type="radio" name="sex" />女
             </div>
-            <div class="tit">昵称</div>
-            <div class="nickname"><input type="text" placeholder="昵称" /></div>
+            <!-- <div class="tit">昵称</div>
+            <div class="nickname"><input type="text" placeholder="昵称" v-model="nickname" /></div> -->
             <div class="tit">头像</div>
             <div class="head-portrait">
-              <img src="../assets/user.png" alt="">
-              <button>更换图片</button>
+              <img :src="avatar" />
+              <button>
+                <input type="file"
+                name="avatar"
+                accept="image/gif,image/jpeg,image/jpg,image/png"
+                @change="changeImage($event)"
+                ref="avatarInput" />更换图片
+              </button>
             </div>
           </div>
-          <div class="save">保存修改</div>
+          <div class="save" @click="saveChange">保存修改</div>
         </div>
       </div>
     </div>
     <div class="new-collections" v-if="createShow">
+      <!-- 创建新收藏 -->
       <div class="alert" v-show="newCollection">
         <h2>创建新收藏</h2>
         <div class="name">
           <span>名称</span>
-          <input type="text" placeholder="输入名称" />
+          <input type="text" placeholder="输入名称" v-model="folderName" />
         </div>
         <div class="cancel">
           <button @click="build">创建</button>
           <button @click="cancel">取消</button>
         </div>
       </div>
+      <!-- 退出账号 -->
       <div class="alert" v-show="siginOut">
         <h2>退出账号</h2>
         <div class="name">
@@ -71,32 +89,39 @@
           <button @click="cancel">取消</button>
         </div>
       </div>
+      <!-- 忘记密码 -->
       <div class="alert change_password" v-show="isChangePass">
         <h3>更改密码</h3>
+        <img src="../assets/close.png" @click="cancel" />
         <div class="alter">
           <div class="code">旧密码</div>
-          <input type="password" placeholder="单行输入" />
-          <div class="forget">忘记密码？</div>
+          <input type="password" placeholder="单行输入" v-model="oldPw" />
+          <div class="forget" @click="forgot">忘记密码？</div>
         </div>
         <div class="alter">
           <div class="code">新密码</div>
-          <input type="password" placeholder="单行输入" />
+          <input type="password" placeholder="单行输入" v-model="newPw" />
         </div>
         <div class="alter">
           <div class="code">确认密码</div>
-          <input type="password" placeholder="单行输入" />
+          <input type="password" placeholder="单行输入" v-model="confirmPw" />
         </div>
         <div class="cancel">
-          <button @click="signout">确认</button>
+          <button @click="confirmChange">确认</button>
           <button @click="cancel">取消</button>
         </div>
       </div>
+    </div>
+    <div class="forget_pw" v-if="isForgetShow">
+      <ForgetPassword />
     </div>
   </div>
 </template>
 
 <script>
 import HeadPage from './assembly/Header'
+import ForgetPassword from './assembly/ForgetPassword'
+import WaterFull from './assembly/WaterFull'
 export default {
   name: 'personalcenter',
   data () {
@@ -105,12 +130,218 @@ export default {
       siginOut: false,
       isSetUpShow: false,
       newCollection: false,
-      isChangePass: false
+      isChangePass: false,
+      oldPw: '',
+      newPw: '',
+      confirmPw: '',
+      isForgetShow: false,
+      avatar: '',
+      user: '',
+      collectionList: [],
+      folderName: '',
+      isPictureShow: false,
+      foldName: '',
+      imgList: [],
+      row: 4,
+      email: '',
+      nickname: ''
     }
   },
+  mounted () {
+    this.getInfoData()
+    this.getCollectionData()
+    document.getElementById('list_item').style.width = this.row * 221 + 'px'
+  },
   methods: {
+    // 保存修改
+    saveChange () {
+      let that = this
+      let config = { emulateJSON: true }
+      if (this.user.userEmail === 'null') {
+        this.email = 0
+      } else {
+        this.email = this.email
+      }
+      if (this.user.userPhone === 'null') {
+        this.user.userPhone = 0
+      } else {
+        this.user.userPhone = this.user.userPhone
+      }
+      that.$http.post('http://www.temaxd.com/Hooott/updateUserInfo.cz', {
+        userEmail: this.email,
+        userPhone: this.user.userPhone,
+        userSex: '男',
+        userId: JSON.parse(localStorage.getItem('token'))
+      }, config).then(res => {
+        console.log(res.data)
+        history.go(0)
+      })
+    },
+    back () {
+      this.isPictureShow = false
+    },
+    showFolderImages (id, name) {
+      this.isPictureShow = true
+      this.imgList = []
+      this.foldName = name
+      let that = this
+      that.$http.get('http://www.temaxd.com/Hooott/folderCardAll.cz', {
+        params: {
+          folderId: id
+        }
+      }).then(res => {
+        // console.log(res.data.split('[')[1].split(']')[0].split(', {'))
+        let list = res.data.split('[')[1].split(']')[0]
+        if (list.indexOf(', {') === -1) {
+          this.imgList.push(JSON.parse(list))
+        } else {
+          list.split(', {').forEach((v, k) => {
+            if (k !== 0) {
+              v = '{' + v
+            }
+            // console.log(v)
+            this.imgList.push(JSON.parse(v))
+          })
+        }
+      })
+    },
+    getCollectionData () {
+      let that = this
+      that.$http.get('http://www.temaxd.com/Hooott/folderUserAll.cz', {
+        params: {
+          userId: JSON.parse(localStorage.getItem('token'))
+        }
+      }).then(res => {
+        // console.log(res.data)
+        let list = res.data.split('[')[1].split(']')[0]
+        if (list.indexOf(',') === -1) {
+          this.collectionList.push(JSON.parse(list))
+          that.$http.get('http://www.temaxd.com/Hooott/folderCardAll.cz', {
+            params: {
+              folderId: JSON.parse(list).folderId
+            }
+          }).then(res => {
+            // 没有收藏图片
+            if (res.data.indexOf('[') === -1) {
+              let item = {
+                folderName: JSON.parse(list).folderName,
+                folderId: JSON.parse(list).folderId,
+                ossImage: '~/assets/pic.png'
+              }
+              this.collectionList.push(item)
+            } else {
+              let folderImg = res.data.split('[')[1].split(']')[0]
+              if (folderImg.indexOf(', {') === -1) {
+                let item = {
+                  folderName: JSON.parse(list).folderName,
+                  folderId: JSON.parse(list).folderId,
+                  ossImage: JSON.parse(folderImg).ossImage
+                }
+                this.collectionList.push(item)
+              } else {
+                folderImg.split(', {').forEach((m, n) => {
+                  if (n === 0) {
+                    let item = {
+                      folderName: JSON.parse(list).folderName,
+                      folderId: JSON.parse(list).folderId,
+                      ossImage: JSON.parse(m).ossImage
+                    }
+                    this.collectionList.push(item)
+                  }
+                })
+              }
+            }
+          })
+        } else {
+          list.split(', {').map((v, k) => {
+            if (k !== 0) {
+              v = '{' + v
+            }
+            that.$http.get('http://www.temaxd.com/Hooott/folderCardAll.cz', {
+              params: {
+                folderId: JSON.parse(v).folderId
+              }
+            }).then(res => {
+              if (res.data.indexOf('[') === -1) {
+                let item = {
+                  folderName: JSON.parse(v).folderName,
+                  folderId: JSON.parse(v).folderId,
+                  ossImage: '~/assets/pic.png'
+                }
+                this.collectionList.push(item)
+              } else {
+                let folderImg = res.data.split('[')[1].split(']')[0]
+                if (folderImg.indexOf(', {') === -1) {
+                  let item = {
+                    folderName: JSON.parse(v).folderName,
+                    folderId: JSON.parse(v).folderId,
+                    ossImage: JSON.parse(folderImg).ossImage
+                  }
+                  this.collectionList.push(item)
+                } else {
+                  folderImg.split(', {').forEach((m, n) => {
+                    if (n === 0) {
+                      let item = {
+                        folderName: JSON.parse(v).folderName,
+                        folderId: JSON.parse(v).folderId,
+                        ossImage: JSON.parse(m).ossImage
+                      }
+                      this.collectionList.push(item)
+                    }
+                  })
+                }
+              }
+            })
+          })
+        }
+      }).catch(err => {
+        console.log(err)
+      })
+    },
+    getInfoData () {
+      let that = this
+      that.$http.get('http://www.temaxd.com/Hooott/getUser.cz', {
+        params: {
+          userId: JSON.parse(localStorage.getItem('token'))
+        }
+      }).then(res => {
+        console.log(JSON.parse(res.data))
+        this.user = JSON.parse(res.data)
+        this.email = this.user.userEmail
+      })
+    },
+    // 上传头像
+    changeImage (e) {
+      var file = e.target.files[0]
+      console.log(file)
+      var reader = new FileReader()
+      var that = this
+      reader.onload = function (e) {
+        that.avatar = this.result
+      }
+      reader.readAsDataURL(file)
+      var image = new FormData()
+      if (this.user.userAvatar === 'null') {
+        this.user.userAvatar = 0
+      }
+      image.append('file', file)
+      image.append('oldAvatar', this.user.userAvatar)
+      image.append('ossType', file.type.split('/')[1])
+      image.append('userId', this.user.userId)
+      console.log(image)
+      that.$http.post('http://www.temaxd.com/Hooott/avatarUser.cz', image, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      }).then(res => {
+        console.log(res)
+        this.getInfoData()
+      })
+    },
+    // 设置
     setUp () {
       this.isSetUpShow = true
+      this.isPictureShow = false
     },
     // 创建新收藏
     createNewItem () {
@@ -119,30 +350,67 @@ export default {
       this.newCollection = true
       this.isChangePass = false
     },
+    // 取消
     cancel () {
       this.createShow = false
     },
     build () {
-      this.createShow = false
+      let that = this
+      that.$http.get('http://www.temaxd.com/Hooott/addFolder.cz', {
+        params: {
+          userId: JSON.parse(localStorage.getItem('token')),
+          folderName: this.folderName
+        }
+      }).then(res => {
+        // this.user = JSON.parse(res.data)
+        this.createShow = false
+        // console.log(res.data)
+        this.collectionList = []
+        this.getCollectionData()
+      })
     },
+    // 确认退出
     signout () {
       this.createShow = false
+      localStorage.clear('token')
+      this.$router.push('/')
     },
+    // 退出账号
     userOut () {
       this.createShow = true
       this.siginOut = true
       this.newCollection = false
       this.isChangePass = false
     },
+    // 修改密码的弹窗显示
     changePassword () {
       this.createShow = true
       this.siginOut = false
       this.newCollection = false
       this.isChangePass = true
+    },
+    confirmChange () {
+      let that = this
+      let config = { headers: { 'Content-Type': 'multipart/form-data' } }
+      that.$http.post('http://www.temaxd.com/Hooott/updateUser.cz?account=' + this.user.userPhone + '&oldPwd=' + this.oldPw + '&password=' + this.newPw, {}, config).then(res => {
+        // console.log(res)
+        let data = JSON.parse(res.data)
+        if (data[0].CODE === '200') {
+          this.createShow = false
+        } else {
+          console.log(data[1].MESSAGE)
+        }
+      })
+    },
+    forgot () {
+      // this.isForgetShow = true
+      // this.createShow = false
     }
   },
   components: {
-    HeadPage
+    HeadPage,
+    ForgetPassword,
+    WaterFull
   }
 }
 </script>
@@ -154,7 +422,7 @@ export default {
     width: 1250px;
     padding-top: 120px;
     margin: 0 auto;
-    overflow: hidden;
+    // overflow: hidden;
   }
 }
 .personal-info {
@@ -170,6 +438,12 @@ export default {
     border: 1px solid #ccc;
     border-radius: 50%;
     cursor: pointer;
+    img {
+      width: 100%;
+      min-height: 100%;
+      border-radius: 50%;
+      display: block;
+    }
   }
   .l {
     width: 140px;
@@ -207,24 +481,51 @@ export default {
         }
       }
     }
+    .folder {
+      cursor: pointer;
+    }
     .r {
       float: left;
-      width: 258px;
+      width: 244px;
       height: 210px;
-      margin-left: 60px;
+      margin-left: 58px;
+      margin-bottom: 50px;
       // border: 1px solid #ccc;
       .pic {
-        width: 256px;
-        height: 170px;
-        border: 2px solid #ccc;
-        border-radius: 20px;
-        margin-bottom: 10px;
+        width: 240px;
+        height: 154px;
+        border: 2px solid #999;
+        border-radius: 16px;
+        margin-bottom: 12px;
+        background-size: cover;
       }
       span {
-        font-size: 16px;
-        color:  #666;
+        font-size: 16pt;
+        color:  #ccc;
         padding-left: 20px;
       }
+    }
+  }
+  .images {
+    padding-left: 56px;
+    border-left: 1px solid #ccc;
+    min-height: 511px;
+    .name {
+      line-height: 48px;
+      font-size: 28px;
+      color:  #666;
+      // padding-left: 10px;
+      img {
+        width: 48px;
+        float: left;
+        margin-right: 10px;
+        cursor: pointer;
+      }
+    }
+    .img-list {
+      min-height: 400px;
+      position: relative;
+      padding-top: 20px;
     }
   }
   .set-up-show {
@@ -312,6 +613,17 @@ export default {
           cursor: pointer;
           outline: none;
           margin: 50px 0 0 20px;
+          position: relative;
+          input {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            opacity: 0;
+            outline: none;
+            cursor: pointer;
+          }
         }
       }
     }
@@ -326,10 +638,11 @@ export default {
       line-height: 43px;
       text-align: center;
       margin: 30px auto 0;
+      cursor: pointer;
     }
   }
 }
-.new-collections {
+.new-collections,.forget_pw {
   position: fixed;
   width: 100%;
   height: 100%;
@@ -392,6 +705,13 @@ export default {
     width: 476px;
     height: 380px;
     margin: -280px 0 0 -238px;
+    img {
+      width: 24px;
+      position: absolute;
+      right: 30px;
+      top: 20px;
+      cursor: pointer;
+    }
     h3 {
       line-height: 41px;
       font-size: 25px;
@@ -440,6 +760,20 @@ export default {
         height: 40px;
       }
     }
+  }
+}
+.forget_pw {
+  .forget_password {
+    width: 500px;
+    height: 300px;
+    background: rgba(255, 255, 255, 0.6);
+    position: relative;
+    left: 50%;
+    top: 50%;
+    margin-top: -150px;
+    margin-left: -250px;
+    border-radius: 10px;
+    text-align: center;
   }
 }
 </style>

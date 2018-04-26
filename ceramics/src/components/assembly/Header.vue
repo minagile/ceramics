@@ -4,7 +4,7 @@
       <img src="../../assets/menu.png" @click="menuShow($event)" />
       <div class="menu-list">
         <span class="arrow"></span>
-        <div v-for="(item, index) in menuList" :key="index"><a href="">{{ item }}</a></div>
+        <div v-for="(item, index) in menuList" :key="index"><router-link :to="item.link">{{ item.name }}</router-link></div>
       </div>
     </div>
     <div class="title"><span @click="backToHome">HOOOT.T</span></div>
@@ -25,7 +25,7 @@ export default {
   name: 'headpage',
   data () {
     return {
-      menuList: ['关于我们', '服务条款']
+      menuList: [{name: '关于我们', link: '/aboutus'}, {name: '服务条款', link: '/serverterms'}]
     }
   },
   methods: {
