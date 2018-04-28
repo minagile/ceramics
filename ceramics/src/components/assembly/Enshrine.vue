@@ -409,6 +409,11 @@ export default {
             background: #e51c23;
             font-size: 10px;
             text-align: center;
+            transition: 1s;
+            &:hover {
+              transition: 1s;
+              background: #be1a1f;
+            }
           }
         }
       }
@@ -430,6 +435,11 @@ export default {
           margin: 20px 36px 0 23px;
           cursor: pointer;
           outline: none;
+          transition: 1s;
+          &:hover {
+            transition: 1s;
+            background: #d4d2d2;
+          }
           &:nth-of-type(2) {
             float: right;
           }

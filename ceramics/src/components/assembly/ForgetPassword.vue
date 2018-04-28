@@ -62,9 +62,10 @@ export default {
             } else {
               that.$http.post('http://www.temaxd.com/Hooott/sendPhone.cz?phone=' + this.user, {}, config).then(res => {
                 let status = JSON.parse(res.data)
+                // console.log(status)
                 this.timeOut = true
                 this.countDown(60, ev.path[0])
-                this.data = status[2].RAND
+                this.data = status.RAND
               })
             }
           } else {
@@ -74,6 +75,7 @@ export default {
             } else {
               that.$http.post('http://www.temaxd.com/Hooott/sendEmail.cz?email=' + this.user, {}, config).then(res => {
                 let status = JSON.parse(res.data)
+                // console.log(status)
                 this.timeOut = true
                 this.countDown(60, ev.path[0])
                 this.data = status[1].RAND
@@ -98,11 +100,12 @@ export default {
               let config = { headers: { 'Content-Type': 'multipart/form-data' } }
               that.$http.post('http://www.temaxd.com/Hooott/forgetUser.cz?account=' + this.user + '&password=' + this.password, {}, config).then(res => {
                 let change = JSON.parse(res.data)
-                if (change[0].CODE === '200') {
-                  console.log(change[1].MESSAGE)
+                console.log(change)
+                if (change.CODE === '200') {
+                  console.log(change.MESSAGE)
                   this.$emit('confirm')
                 } else {
-                  alert(change[1].MESSAGE)
+                  alert(change.MESSAGE)
                 }
               })
             } else {
@@ -115,11 +118,11 @@ export default {
               let config = { headers: { 'Content-Type': 'multipart/form-data' } }
               that.$http.post('http://www.temaxd.com/Hooott/forgetUser.cz?account=' + this.user + '&password=' + this.password, {}, config).then(res => {
                 let change = JSON.parse(res.data)
-                if (change[0].CODE === '200') {
-                  console.log(change[1].MESSAGE)
+                if (change.CODE === '200') {
+                  console.log(change.MESSAGE)
                   this.$emit('confirm')
                 } else {
-                  alert(change[1].MESSAGE)
+                  alert(change.MESSAGE)
                 }
               })
             } else {

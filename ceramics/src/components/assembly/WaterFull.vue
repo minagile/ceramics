@@ -34,12 +34,17 @@ export default {
   },
   methods: {
     imgLevel (id) {
-      this.$emit('imgId', id)
-      // console.log(id)
-      this.$router.push({
-        name: 'TwoLevelPage',
-        query: {id: id}
-      })
+      let token = localStorage.getItem('token')
+      if (token === null) {
+        this.$emit('notoken', true)
+      } else {
+        this.$emit('imgId', id)
+        // console.log(id)
+        this.$router.push({
+          name: 'TwoLevelPage',
+          query: {id: id}
+        })
+      }
     },
     getData (data) {
       // console.log(data)
@@ -120,6 +125,8 @@ function loadImage (url) {
 .water-fall {
   width: 100%;
   height: 100%;
+  // padding-top: 10px;
+  // background: #0ff000;
   .popup {
     position: absolute;
     top: 0;

@@ -69,11 +69,11 @@ export default {
         let config = { headers: { 'Content-Type': 'multipart/form-data' } }
         that.$http.post('http://www.temaxd.com/Hooott/registerUser.cz?account=' + this.userPhone + '&password=' + this.password, {}, config).then(res => {
           let status = JSON.parse(res.data)
-          if (status[0].CODE === '200') {
+          if (status.CODE === '200') {
             this.register = false
             this.login = true
           } else {
-            alert(status[1].MESSAGE)
+            alert(status.MESSAGE)
           }
         })
       } else {
@@ -118,6 +118,7 @@ export default {
   left: 0;
   width: 100%;
   height: 100%;
+  z-index: 999;
 }
 .popup {
   width: 420px;

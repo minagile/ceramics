@@ -48,13 +48,13 @@ export default {
       let config = { headers: { 'Content-Type': 'multipart/form-data' } }
       that.$http.post('http://www.temaxd.com/Hooott/userLogin.cz?account=' + this.user + '&password=' + this.password, {}, config).then(res => {
         let status = JSON.parse(res.data)
-        console.log(status)
-        if (status[0].CODE === '200') {
-          // alert(status[1].MESSAGE)
+        // console.log(status)
+        if (status.CODE === '200') {
+          // alert(status.MESSAGE)
           this.$emit('loginSuccess')
-          localStorage.setItem('token', JSON.stringify(status[2].userId))
+          localStorage.setItem('token', JSON.stringify(status.userId))
         } else {
-          alert(status[1].MESSAGE)
+          alert(status.MESSAGE)
         }
       })
     },

@@ -1,7 +1,8 @@
 <template>
   <div class="head-page">
     <div class="menu">
-      <img src="../../assets/menu.png" @click="menuShow($event)" />
+      <div class="menu-img" @click="menuShow($event)"></div>
+      <!-- <img src="../../assets/menu2.png" /> -->
       <div class="menu-list" v-show="isMenuShow">
         <span class="arrow"></span>
         <div class="cover">
@@ -15,7 +16,7 @@
         <input type="text" placeholder="" />
         <img src="../../assets/search.png" @click="searchShow($event)" />
       </div> -->
-      <img class="userInfo" src="../../assets/user.png" @click="personCenter" />
+      <div class="userInfo" @click="personCenter"></div>
     </div>
     <Register v-if="item" @login="login"></Register>
   </div>
@@ -28,7 +29,8 @@ export default {
   data () {
     return {
       menuList: [{name: '关于我们', link: '/aboutus'}, {name: '服务条款', link: '/serverterms'}],
-      isMenuShow: false
+      isMenuShow: false,
+      item: false
     }
   },
   methods: {
@@ -52,11 +54,13 @@ export default {
       }
     },
     menuShow (ev) {
+      // console.log(ev.path[1].children[1])
       this.isMenuShow = true
-      if (ev.path[1].children[1].style.display === 'none' || ev.path[1].children[1].style.display === '') {
-        ev.path[1].children[1].style.display = 'block'
-      } else {
+      // ev.path[1].children[1].style.display = 'block'
+      if (ev.path[1].children[1].style.display === 'block') {
         ev.path[1].children[1].style.display = 'none'
+      } else {
+        ev.path[1].children[1].style.display = 'block'
       }
     },
     // 搜索框弹出与隐藏
@@ -77,14 +81,6 @@ export default {
   },
   components: {
     Register
-  },
-  props: {
-    item: {
-      type: Boolean,
-      default () {
-        return false
-      }
-    }
   }
 }
 </script>
@@ -99,17 +95,24 @@ export default {
   top: 0;
   left: 0;
   z-index: 9;
-  img {
-    width: 30px;
-    cursor: pointer;
-  }
   .menu {
     position: absolute;
     left: 0;
     top: 0;
     height: 80px;
+    .menu-img {
+      width: 30px;
+      height: 30px;
+      cursor: pointer;
+      background-image: url('../../assets/menu3.png');
+      background-size: cover;
+      margin: 25px 0 0 25px;
+      &:hover {
+        background-image: url('../../assets/menu2.png');
+      }
+    }
     .menu-list {
-      display: none;
+      // display: none;
       width: 180px;
       // border: 1px solid #ccc;
       box-shadow: 0 0 5px #ccc;
@@ -154,17 +157,17 @@ export default {
         }
       }
     }
-    img {
-      display: block;
-      margin: 25px 0 0 25px;
-    }
   }
   .title {
     text-align: center;
     line-height: 80px;
-    font-size: 22px;
+    font-size: 23px;
     font-weight: 800;
     letter-spacing: 3px;
+    cursor: pointer;
+    // &:hover {
+    //   color: #666;
+    // }
     span {
       cursor: pointer;
     }
@@ -201,7 +204,14 @@ export default {
     .userInfo {
       float: right;
       margin-top: 25px;
-      display: block;
+      width: 30px;
+      height: 30px;
+      cursor: pointer;
+      background-image: url(../../assets/user.png);
+      background-size: cover;
+      &:hover {
+        background-image: url(../../assets/person.png);
+      }
     }
   }
 }

@@ -36,7 +36,7 @@
       </div>
       <div class="joy">乍见之欢 久看不厌</div>
       <div class="brief">
-        <img src="../assets/pic8.jpg" />
+        <img src="../assets/pic9.jpg" />
         <div class="introduce">
           <h2>我 们 的 想 法</h2>
           <div class="big">我想仔细聆听故事，仔细地<br />创造一个围绕你我生活的陶瓷空间。</div>
@@ -61,11 +61,11 @@ export default {
       swiperOption: {
         // autoplay: true,
         autoplay: {
-          delay: 1000,
+          delay: 2000,
           stopOnLastSlide: false,
           disableOnInteraction: false
         },
-        speed: 300,
+        speed: 3000,
         pagination: {
           el: '.swiper-pagination',
           type: 'bullets',
@@ -175,6 +175,7 @@ export default {
       padding: 180px 0 130px 50px;
       overflow: hidden;
       img {
+        padding-top: 70px;
         width: 374px;
         display: block;
         float: left;

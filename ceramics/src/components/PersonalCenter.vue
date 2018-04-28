@@ -31,6 +31,9 @@
           </div>
           <div class="folder r" v-for="(item, index) in collectionList" :key="index" @click="showFolderImages(item.folderId, item.folderName)">
             <div class="pic" :style="{'background-image': 'url(' + item.ossImage + ')'}" v-if="item.ossImage ? true : false"></div>
+            <!-- <div class="pic" v-if="item.ossImage ? true : false" ref="picImagesList">
+              <img v-for="(data, index) in item.list" :key="index" :src="data.ossImage" />
+            </div> -->
             <div class="pic" :style="{'background-image': 'url(https://spider-x.oss-cn-shanghai.aliyuncs.com/CeramicCard/123268465508140855.jpg)'}" v-if="item.ossImage ? false : true"></div>
             <span>{{ item.folderName }}</span>
             <div class="cover"></div>
@@ -352,16 +355,25 @@ export default {
                   }
                   this.collectionList.push(item)
                 } else {
+                  let item = {}
+                  item.list = []
                   folderImg.split(', {').forEach((m, n) => {
                     if (n === 0) {
-                      let item = {
-                        folderName: JSON.parse(v).folderName,
-                        folderId: JSON.parse(v).folderId,
-                        ossImage: JSON.parse(m).ossImage
-                      }
-                      this.collectionList.push(item)
+                      // let item = {
+                      //   folderName: JSON.parse(v).folderName,
+                      //   folderId: JSON.parse(v).folderId,
+                      //   ossImage: JSON.parse(m).ossImage
+                      // }
+                      item.folderName = JSON.parse(v).folderName
+                      item.folderId = JSON.parse(v).folderId
+                      item.ossImage = JSON.parse(m).ossImage
+                    } else {
+                      m = '{' + m
                     }
+                    item.list.push({ossImage: JSON.parse(m).ossImage})
                   })
+                  this.collectionList.push(item)
+                  // this.folderImgList(this.collectionList)
                 }
               }
             })
@@ -369,6 +381,36 @@ export default {
         }
       }).catch(err => {
         console.log(err)
+      })
+    },
+    // 瀑布流--->文件夹
+    folderImgList (data) {
+      data.forEach((x, y) => {
+        x.list.forEach((m, n) => {
+          loadImage(m.ossImage).then(img => {
+            this.$nextTick(() => {
+              let list = this.$refs.picImagesList
+              // console.log(list)
+              let arr = []
+              list.forEach(i => {
+                // console.log(i.children)
+                for (var j = 0; j < i.children.length; j++) {
+                  if (j < 4) {
+                    i.children[j].style.top = 0
+                    i.children[j].style.left = 61 * j + 'px'
+                    arr.push(i.children[j].offsetHeight)
+                  } else {
+                    let iMinH = Math.min(...arr)
+                    let iMinIndex = arr.indexOf(iMinH)
+                    i.children[j].style.left = iMinIndex * 61 + 'px'
+                    i.children[j].style.top = iMinH + 'px'
+                    arr[iMinIndex] = iMinH + i.children[j].offsetHeight
+                  }
+                }
+              })
+            })
+          }).catch(err => console.log(err))
+        })
       })
     },
     // 获取个人信息
@@ -379,7 +421,7 @@ export default {
           userId: JSON.parse(localStorage.getItem('token'))
         }
       }).then(res => {
-        console.log(JSON.parse(res.data))
+        // console.log(JSON.parse(res.data))
         this.user = JSON.parse(res.data)
         this.email = this.user.userEmail
         this.avatar = this.user.userAvatar
@@ -493,6 +535,14 @@ export default {
     ForgetPassword,
     WaterFull
   }
+}
+function loadImage (url) {
+  return new Promise((resolve, reject) => {
+    let img = new Image()
+    img.onload = () => resolve(img)
+    img.onerror = reject
+    img.src = url
+  })
 }
 </script>
 
@@ -616,6 +666,16 @@ export default {
     }
     .folder {
       position: relative;
+      // .pic {
+      //   background: #e6e6e6;
+      //   position: relative;
+      //   overflow: hidden;
+      //   img {
+      //     position: absolute;
+      //     width: 61px;
+      //     // display: block;
+      //   }
+      // }
       .cover {
         &:hover {
           transition: 1s;
