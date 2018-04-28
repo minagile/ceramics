@@ -120,14 +120,14 @@ export default {
   height: 100%;
 }
 .popup {
-  width: 500px;
-  height: 300px;
+  width: 420px;
+  height: 250px;
   background: rgba(255, 255, 255, 0.6);
   position: relative;
   left: 50%;
   top: 50%;
-  margin-top: -150px;
-  margin-left: -250px;
+  margin-top: -125px;
+  margin-left: -210px;
   border-radius: 10px;
   text-align: center;
   .user_register {
@@ -138,29 +138,34 @@ export default {
   }
 }
 .content {
-  width: 300px;
+  width: 272px;
   height: 100%;
   h2 {
     text-align: center;
-    height: 86px;
-    line-height: 100px;
+    height: 26px;
+    font-size: 26px;
+    color: #333;
+    line-height: 26px;
+    padding: 36px 0 18px 0;
   }
   input {
     display: block;
-    margin: 0 auto 6px;
-    width: 144px;
+    margin: 0 auto 8px;
+    width: 136px;
     height: 24px;
     padding-left: 10px;
     background: #fff;
     border: 0;
+    color: #ccc;
     border-radius: 4px;
     outline: none;
   }
   button {
     display: block;
-    margin: 10px auto 0;
-    width: 100px;
-    height: 24px;
+    margin: 6px auto 0;
+    width: 64px;
+    height: 16px;
+    font-size: 12px;
     background: rgb(224, 27, 27);
     border-radius: 4px;
     color: #fff;
@@ -170,8 +175,9 @@ export default {
   }
   .to_login {
     cursor: pointer;
-    font-size: 12px;
-    color: #666;
+    font-size: 10px;
+    color: #ccc;
+    text-decoration: underline;
   }
 }
 </style>

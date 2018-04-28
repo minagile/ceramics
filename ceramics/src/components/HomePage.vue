@@ -44,25 +44,13 @@ export default {
     next()
   },
   mounted () {
-    // this.clientChange()
+    this.clientChange()
     window.addEventListener('resize', this.clientWidthChange)
     document.getElementById('items').style.width = this.row * PIC_WIDTH + 'px'
     this.getData()
     window.addEventListener('scroll', this.handleScroll)
   },
   methods: {
-    imgId (data) {
-      this.isLevelShow = true
-      this.id = data
-    },
-    // imgLevel (id) {
-    //   this.isLevelShow = true
-    //   this.id = id
-    //   // this.$router.push({
-    //   //   name: 'TwoLevelPage',
-    //   //   params: {id: id}
-    //   // })
-    // },
     levelClose (data) {
       this.isLevelShow = data
     },
@@ -100,23 +88,6 @@ export default {
     clientWidthChange () {
       this.clientChange()
     },
-    // waterFull () {
-    //   let list = this.$refs.imgList
-    //   let arr = []
-    //   list.forEach((v, k) => {
-    //     if (k < this.row) {
-    //       v.style.top = 0
-    //       v.style.left = PIC_WIDTH * k + 'px'
-    //       arr.push(v.offsetHeight)
-    //     } else {
-    //       let iMinH = Math.min(...arr)
-    //       let iMinIndex = arr.indexOf(iMinH)
-    //       v.style.left = iMinIndex * PIC_WIDTH + 'px'
-    //       v.style.top = iMinH + 20 + 'px'
-    //       arr[iMinIndex] = iMinH + v.offsetHeight + 20
-    //     }
-    //   })
-    // },
     getData () {
       let that = this
       that.$http.get('http://www.temaxd.com/Hooott/cardJson.cz').then(res => {
@@ -137,7 +108,7 @@ export default {
 
 <style lang="less" scoped>
 .home-page {
-  padding-top: 80px;
+  padding-top: 120px;
   .first-page {
     // width: 1200px;
     margin: 0 auto;

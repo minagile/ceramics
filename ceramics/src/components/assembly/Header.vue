@@ -4,15 +4,17 @@
       <img src="../../assets/menu.png" @click="menuShow($event)" />
       <div class="menu-list" v-show="isMenuShow">
         <span class="arrow"></span>
-        <div v-for="(item, index) in menuList" @click="link" :key="index"><router-link :to="item.link">{{ item.name }}</router-link></div>
+        <div class="cover">
+          <div v-for="(item, index) in menuList" @click="link" :key="index"><router-link :to="item.link">{{ item.name }}</router-link></div>
+        </div>
       </div>
     </div>
     <div class="title" @click="backToHome"><span>HOOOT.T</span></div>
     <div class="user">
-      <div class="search">
+      <!-- <div class="search">
         <input type="text" placeholder="" />
         <img src="../../assets/search.png" @click="searchShow($event)" />
-      </div>
+      </div> -->
       <img class="userInfo" src="../../assets/user.png" @click="personCenter" />
     </div>
     <Register v-if="item" @login="login"></Register>
@@ -91,7 +93,7 @@ export default {
 .head-page {
   width: 100%;
   height: 80px;
-  border-bottom: 1px solid #666;
+  border-bottom: 1px solid #bbb;
   position: fixed;
   background: #fff;
   top: 0;
@@ -108,20 +110,31 @@ export default {
     height: 80px;
     .menu-list {
       display: none;
-      width: 160px;
-      padding: 0 10px;
-      border: 1px solid #ccc;
+      width: 180px;
+      // border: 1px solid #ccc;
+      box-shadow: 0 0 5px #ccc;
       position: absolute;
       left: 25px;
       top: 70px;
       background: #fff;
+      z-index: 9;
+      .cover {
+        position: relative;
+        z-index: 99;
+        height: 100%;
+        width: 160px;
+        background: #fff;
+        padding: 0 10px;
+      }
       .arrow {
         position: absolute;
         width: 14px;
         height: 14px;
         display: block;
-        border-top: 1px solid #ccc;
-        border-left: 1px solid #ccc;
+        z-index: 1;
+        // border-top: 1px solid #ccc;
+        // border-left: 1px solid #ccc;
+        box-shadow: 0 0 5px #ccc;
         transform: rotate(45deg);
         top: -9px;
         left: 4px;

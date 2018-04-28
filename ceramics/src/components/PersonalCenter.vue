@@ -3,7 +3,10 @@
     <head-page></head-page>
     <div class="personal">
       <div class="back_to_homepage">
-        <router-link to="/">返回首页</router-link>
+        <router-link to="/">
+          <img src="../assets/back.png" alt="">
+          <span>返回首页</span>
+        </router-link>
       </div>
       <div class="personal-info">
         <div class="img">
@@ -17,9 +20,9 @@
         <div class="set-up l" @click="setUp">设置</div>
         <div class="sigin-out l" @click="userOut">退出账号</div>
       </div>
-      <div class="right">
+      <div class="right" id="big_box">
         <!-- 文件夹 -->
-        <div class="first-enter" v-if="!isSetUpShow" v-show="!isPictureShow">
+        <div class="first-enter" id="first_enter" v-if="!isSetUpShow" v-show="!isPictureShow">
           <div class="create-new r">
             <div class="pic" @click="createNewItem">
               <img src="../assets/add.png" alt="">
@@ -27,18 +30,20 @@
             <span>创建新收藏</span>
           </div>
           <div class="folder r" v-for="(item, index) in collectionList" :key="index" @click="showFolderImages(item.folderId, item.folderName)">
-            <div class="pic" :style="{'background-image': 'url(' + item.ossImage + ')'}"></div>
+            <div class="pic" :style="{'background-image': 'url(' + item.ossImage + ')'}" v-if="item.ossImage ? true : false"></div>
+            <div class="pic" :style="{'background-image': 'url(https://spider-x.oss-cn-shanghai.aliyuncs.com/CeramicCard/123268465508140855.jpg)'}" v-if="item.ossImage ? false : true"></div>
             <span>{{ item.folderName }}</span>
+            <div class="cover"></div>
           </div>
         </div>
         <!-- 收藏夹中的图片 -->
-        <div class="images" v-show="isPictureShow">
+        <div class="images" id="collection_imgs" v-show="isPictureShow">
           <div class="name">
             <img src="../assets/back.png" alt="" @click="back">
             {{ foldName }}
           </div>
           <div id="list_item" class="img-list">
-            <WaterFull :Images="imgList" :row="row" :picWidth="181" />
+            <WaterFull :Images="imgList" :row="row" :picWidth="200" :maxh="500" @maxHeight="calculateHeight" />
           </div>
         </div>
         <!-- 个人设置 -->
@@ -155,7 +160,7 @@ export default {
       isPictureShow: false,
       foldName: '',
       imgList: [],
-      row: 4,
+      row: 6,
       email: '',
       nickname: '',
       sex: '男',
@@ -166,9 +171,35 @@ export default {
   mounted () {
     this.getInfoData()
     this.getCollectionData()
+    // this.clientWidthChange()
     document.getElementById('list_item').style.width = this.row * 221 + 'px'
+    window.addEventListener('resize', this.clientWidthChange)
+    // how many rows
+    let columnWidth = document.documentElement.clientWidth
+    let foldNum = Math.floor((columnWidth - 372) / 282)
+    if (columnWidth - 372 > 1000) {
+      document.getElementById('big_box').style.width = columnWidth - 372 + 'px'
+      document.getElementById('first_enter').style.width = foldNum * 282 + 'px'
+    } else {
+      document.getElementById('big_box').style.width = 990 + 'px'
+      document.getElementById('first_enter').style.width = 848 + 'px'
+    }
   },
   methods: {
+    calculateHeight (data) {
+      document.getElementById('collection_imgs').style.height = data + 60 + 'px'
+    },
+    clientWidthChange () {
+      let columnWidth = document.documentElement.clientWidth
+      let foldNum = Math.floor((columnWidth - 357) / 282)
+      if (columnWidth - 357 >= 1000) {
+        document.getElementById('big_box').style.width = columnWidth - 357 + 'px'
+        document.getElementById('first_enter').style.width = foldNum * 282 + 'px'
+      } else {
+        document.getElementById('big_box').style.width = 990 + 'px'
+        document.getElementById('first_enter').style.width = 848 + 'px'
+      }
+    },
     // 发送验证码
     sendCode () {
       let that = this
@@ -234,14 +265,14 @@ export default {
         // console.log(res.data.split('[')[1].split(']')[0].split(', {'))
         let list = res.data.split('[')[1].split(']')[0]
         if (list.indexOf(', {') === -1) {
-          this.imgList.push(JSON.parse(list))
+          this.imgList.push({ossImage: JSON.parse(list).ossImage, id: JSON.parse(list).cardId})
         } else {
           list.split(', {').forEach((v, k) => {
             if (k !== 0) {
               v = '{' + v
             }
             // console.log(v)
-            this.imgList.push(JSON.parse(v))
+            this.imgList.push({ossImage: JSON.parse(v).ossImage, id: JSON.parse(v).cardId})
           })
         }
       })
@@ -268,7 +299,7 @@ export default {
               let item = {
                 folderName: JSON.parse(list).folderName,
                 folderId: JSON.parse(list).folderId,
-                ossImage: '~/assets/pic.png'
+                ossImage: null
               }
               this.collectionList.push(item)
             } else {
@@ -308,7 +339,7 @@ export default {
                 let item = {
                   folderName: JSON.parse(v).folderName,
                   folderId: JSON.parse(v).folderId,
-                  ossImage: '~/assets/pic.png'
+                  ossImage: null
                 }
                 this.collectionList.push(item)
               } else {
@@ -469,22 +500,47 @@ export default {
 .personal-center {
   padding-top: 80px;
   .personal {
-    width: 1250px;
+    width: 100%;
+    min-width: 1360px;
     padding-top: 120px;
-    margin: 0 auto;
+    margin: 0 auto 100px;
+    // border: 1px solid #ccc;
     // overflow: hidden;
+    position: relative;
+    .back_to_homepage {
+      position: absolute;
+      top: 60px;
+      left: 115px;
+      a {
+        text-decoration: none;
+        cursor: pointer;
+      }
+      img {
+        width: 30px;
+        display: block;
+        float: left;
+        margin-right: 10px;
+      }
+      span {
+        line-height: 30px;
+        text-decoration: none;
+        color: #666;
+        font-size: 18px;
+      }
+    }
   }
 }
 .personal-info {
   float: left;
-  width: 237px;
-  height: 511px;
-  padding-right: 52px;
+  width: 356px;
+  height: 484px;
+  // padding-right: 52px;
   padding-top: 20px;
+  border-right: 1px solid #999;
   .img {
-    width: 235px;
-    height: 235px;
-    margin: 0 0 73px 0;
+    width: 224px;
+    height: 224px;
+    margin: 0 auto 70px;
     border: 1px solid #ccc;
     border-radius: 50%;
     cursor: pointer;
@@ -507,77 +563,104 @@ export default {
     }
   }
   .l {
-    width: 140px;
-    height: 40px;
+    width: 129px;
+    height: 36px;
     border: 1px solid #ccc;
-    margin: 0 auto 34px;
+    margin: 0 auto 32px;
     text-align: center;
-    line-height: 40px;
-    border-radius: 40px;
-    font-size: 22px;
+    line-height: 36px;
+    border-radius: 36px;
+    font-size: 20px;
     color: #666;
     cursor: pointer;
+    &:hover {
+      box-shadow: 0 0 5px #ccc;
+    }
   }
   .set-up {
     text-align: right;
-    letter-spacing: 32px;
+    letter-spacing: 30px;
   }
 }
 .right {
   float: left;
+  // width: 1000px;
+  min-width: 848px;
   .first-enter {
-    width: 960px;
-    min-height: 511px;
-    border-left: 1px solid #bbb;
-    padding-top: 20px;
-    overflow: hidden;
-    .create-new {
-      .pic {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        cursor: pointer;
-        img {
-          width: 47px;
-        }
-      }
-    }
-    .folder {
-      cursor: pointer;
-    }
+    width: 848px;
+    padding: 20px 10px 0;
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0 auto 70px;
+    justify-content: space-between;
+    // border: 1px solid #ccc;
     .r {
-      float: left;
       width: 244px;
-      height: 210px;
-      margin-left: 58px;
+      // height: 162px;
       margin-bottom: 50px;
       // border: 1px solid #ccc;
       .pic {
-        width: 240px;
-        height: 154px;
-        border: 2px solid #999;
-        border-radius: 16px;
-        margin-bottom: 12px;
+        width: 100%;
+        height: 162px;
         background-size: cover;
+        margin-bottom: 12px;
+        border-radius: 8px;
+        cursor: pointer;
       }
       span {
-        font-size: 16pt;
-        color:  #ccc;
-        padding-left: 20px;
+        padding-left: 10px;
+        font-size: 16px;
+        color: #666;
+        cursor: pointer;
+      }
+    }
+    .folder {
+      position: relative;
+      .cover {
+        &:hover {
+          transition: 1s;
+          background: rgba(255, 255, 255, 0.7);
+        }
+        cursor: pointer;
+        width: 100%;
+        height: 162px;
+        position: absolute;
+        top: 0;
+        left: 0;
+      }
+    }
+    .create-new {
+      .pic {
+        width: 240px;
+        height: 158px;
+        border: 2px solid rgb(187, 187, 187);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        &:hover {
+      box-shadow: 0 0 6px rgb(187, 187, 187);
+    }
+      }
+      img {
+        width: 38px;
       }
     }
   }
   .images {
     padding-left: 56px;
-    border-left: 1px solid #ccc;
+    // border-left: 1px solid #ccc;
     min-height: 511px;
+    padding-bottom: 300px;
+    // border-bottom: 1px solid #ccc;
+    // margin-bottom: 30px;
     .name {
-      line-height: 48px;
-      font-size: 28px;
+      line-height: 30px;
+      font-size: 20px;
       color:  #666;
+      padding: 0 0 20px 8px;
       // padding-left: 10px;
       img {
-        width: 48px;
+        width: 30px;
         float: left;
         margin-right: 10px;
         cursor: pointer;
@@ -592,7 +675,7 @@ export default {
   .set-up-show {
     width: 918px;
     min-height: 511px;
-    margin-top: -30px;
+    margin: -30px 0 80px 0;
     position: relative;
     padding-left: 42px;
     .border {
@@ -750,6 +833,7 @@ export default {
         border: 1px solid #ccc;
         border-radius: 4px;
         outline: none;
+        text-indent: 10px;
       }
     }
     .cancel {

@@ -73,34 +73,41 @@ export default {
   height: 100%;
   .content {
     float: right;
-    width: 300px;
+    width: 272px;
     height: 100%;
     border-left: 2px solid rgba(0, 0, 0, 0.3);
     h2 {
-      height: 100px;
-      line-height: 120px;
+      text-align: center;
+      height: 26px;
+      font-size: 26px;
+      color: #333;
+      line-height: 26px;
+      padding: 36px 0 18px 0;
     }
     input {
       display: block;
-      width: 144px;
+      margin: 0 auto 8px;
+      width: 136px;
       height: 24px;
       padding-left: 10px;
-      margin: 6px auto;
+      background: #fff;
       border: 0;
+      color: #ccc;
       border-radius: 4px;
       outline: none;
     }
     button {
       display: block;
-      margin: 10px auto 0;
-      width: 100px;
-      height: 24px;
+      margin: 6px auto 0;
+      width: 64px;
+      height: 16px;
+      font-size: 12px;
       background: rgb(224, 27, 27);
       border-radius: 4px;
       color: #fff;
       cursor: pointer;
-      outline: none;
       border: 0;
+      outline: none;
     }
     a {
       cursor: pointer;
@@ -109,7 +116,10 @@ export default {
       font-size: 14px;
     }
     .register {
-      font-size: 12px;
+      cursor: pointer;
+      font-size: 10px;
+      color: #ccc;
+      text-decoration: underline;
     }
   }
 }

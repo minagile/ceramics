@@ -3,8 +3,10 @@
     <!-- 收藏 -->
     <div class="box">
       <div class="left">
-        <img :src="imgSrc" />
-        <span>{{ imgFolder }}</span>
+        <div class="img">
+          <img :src="imgSrc" />
+        </div>
+        <span class="has_collected" id="has_collected">{{ imgFolder }}</span>
       </div>
       <div class="right" v-if="isCreateShow">
         <div class="tit">
@@ -12,10 +14,11 @@
           <img src="../../assets/close.png" @click="close" />
         </div>
         <div class="list">
-          <div class="folder" v-for="(item, index) in collectionList" :key="index" @mouseenter="enter($event)" @mouseleave="leave($event)">
-            <div class="img" :style="{'background-image': 'url(' + item.ossImage + ')'}"></div>
+          <div class="folder" v-for="(item, index) in collectionList" :key="index" @mouseenter="enter($event)" @mouseleave="leave($event)"  @click="collectImage(item.folderId)">
+            <div class="img" :style="{'background-image': 'url(' + item.ossImage + ')'}" v-if="item.ossImage ? true : false"></div>
+            <div class="img" :style="{'background-image': 'url(https://spider-x.oss-cn-shanghai.aliyuncs.com/CeramicCard/123268465508140855.jpg)'}" v-if="item.ossImage ? false : true"></div>
             <span>{{ item.folderName }}</span>
-            <div class="collect" @click="collectImage(item.folderId)">收藏</div>
+            <div class="collect">收藏</div>
           </div>
         </div>
         <div class="create" @click="create">
@@ -33,8 +36,8 @@
           <input type="text" placeholder="输入名称" v-model="folderName" />
         </div>
         <div class="create">
-          <button @click="cancle">取消</button>
-          <button @click="build">确认</button>
+          <button @click="cancle">取 消</button>
+          <button @click="build">确 认</button>
         </div>
       </div>
     </div>
@@ -77,13 +80,17 @@ export default {
             userId: JSON.parse(localStorage.getItem('token')),
             folderId: id
           }, config).then(res => {
-            // console.log(JSON.parse(res.data).CODE)
+            console.log(JSON.parse(res.data).CODE)
             if (JSON.parse(res.data).CODE === '200') {
               this.$emit('enshrineClose', false)
             }
           })
         } else if (JSON.parse(res.data).CODE === '403') {
           this.imgFolder = JSON.parse(res.data).MESSAGE
+          // this.$emit('enshrineClose', false)
+          document.getElementById('has_collected').style.color = 'red'
+          // document.getElementById('has_collected').style.fontSize = '13px'
+          // alert(JSON.parse(res.data).MESSAGE)
         }
       })
     },
@@ -116,6 +123,17 @@ export default {
         // console.log(JSON.parse(res.data))
         this.imgSrc = 'https://spider-x.oss-cn-shanghai.aliyuncs.com/CeramicCard/' + JSON.parse(res.data).ossImage
       })
+      that.$http.get('http://www.temaxd.com/Hooott/folderCardExists.cz', {
+        params: {
+          userId: JSON.parse(localStorage.getItem('token')),
+          cardId: this.id
+        }
+      }).then(res => {
+        // console.log(res.data)
+        if (JSON.parse(res.data).CODE === '403') {
+          this.imgFolder = JSON.parse(res.data).MESSAGE
+        }
+      })
     },
     // 收藏夹
     getCollectionData () {
@@ -139,7 +157,7 @@ export default {
               let item = {
                 folderName: JSON.parse(list).folderName,
                 folderId: JSON.parse(list).folderId,
-                ossImage: '~/assets/pic.png'
+                ossImage: null
               }
               this.collectionList.push(item)
             } else {
@@ -179,7 +197,7 @@ export default {
                 let item = {
                   folderName: JSON.parse(v).folderName,
                   folderId: JSON.parse(v).folderId,
-                  ossImage: '~/assets/pic.png'
+                  ossImage: null
                 }
                 // console.log(k)
                 this.collectionList.push(item)
@@ -218,17 +236,60 @@ export default {
     // 创建收藏夹
     build () {
       let that = this
-      that.$http.get('http://www.temaxd.com/Hooott/addFolder.cz', {
+      // 判断图片是否已收藏
+      that.$http.get('http://www.temaxd.com/Hooott/folderCardExists.cz', {
         params: {
           userId: JSON.parse(localStorage.getItem('token')),
-          folderName: this.folderName
+          cardId: this.id
         }
       }).then(res => {
-        // console.log(res.data)
-        this.collectionList = []
-        this.getCollectionData()
-        this.folderName = ''
-        this.isCreateShow = true
+        // 图片未收藏则将文件传入此文件夹
+        if (JSON.parse(res.data).CODE === '200') {
+          that.$http.get('http://www.temaxd.com/Hooott/addFolder.cz', {
+            params: {
+              userId: JSON.parse(localStorage.getItem('token')),
+              folderName: this.folderName
+            }
+          }).then(res => {
+            // console.log(JSON.parse(res.data))
+            if (JSON.parse(res.data).CODE === '200') {
+              this.collectionList = []
+              this.getCollectionData()
+              this.folderName = ''
+              this.isCreateShow = true
+              let config = { emulateJSON: true }
+              that.$http.post('http://www.temaxd.com/Hooott/saveFolderCard.cz', {
+                ossImage: this.imgSrc,
+                cardId: this.id,
+                userId: JSON.parse(localStorage.getItem('token')),
+                folderId: JSON.parse(res.data).folderId
+              }, config).then(res => {
+                // console.log(JSON.parse(res.data).CODE)
+                if (JSON.parse(res.data).CODE === '200') {
+                  this.$emit('enshrineClose', false)
+                }
+              })
+            }
+            if (JSON.parse(res.data).CODE === '403') {
+              alert(JSON.parse(res.data).MESSAGE)
+            }
+          })
+        } else if (JSON.parse(res.data).CODE === '403') {
+          // this.imgFolder = JSON.parse(res.data).MESSAGE
+          that.$http.get('http://www.temaxd.com/Hooott/addFolder.cz', {
+            params: {
+              userId: JSON.parse(localStorage.getItem('token')),
+              folderName: this.folderName
+            }
+          }).then(res => {
+            if (JSON.parse(res.data).CODE === '200') {
+              this.collectionList = []
+              this.getCollectionData()
+              this.folderName = ''
+              this.$emit('enshrineClose', false)
+            }
+          })
+        }
       })
     }
   },
@@ -267,10 +328,22 @@ export default {
       align-items: center;
       border-right: 1px solid #ccc;
       flex-direction: column;
-      img {
+      .has_collected {
+        font-size: 12px;
+        color: #ccc;
+        letter-spacing: 2px;
+        padding-top: 8px;
+      }
+      .img {
         width: 220px;
-        border-radius: 14px;
-        max-height: 580px;
+        border-radius: 8px;
+        max-height: 400px;
+        overflow: hidden;
+        img {
+          width: 100%;
+          border-radius: 8px;
+          display: block;
+        }
       }
     }
     .right {
@@ -297,12 +370,18 @@ export default {
       }
       .list {
         height: 503px;
-        padding: 5px 24px 0;
+        padding: 5px 0 0;
         overflow-y: scroll;
         .folder {
           height: 37px;
-          margin: 17px 0;
           cursor: pointer;
+          padding: 8px 24px;
+          // transition: 1s;
+          background: #fff;
+          &:hover {
+            // transition: 1s;
+            background: #eaeaea;
+          }
           .img {
             width: 37px;
             height: 37px;
@@ -322,8 +401,8 @@ export default {
             display: none;
             float: right;
             width: 43px;
-            height: 19px;
-            line-height: 19px;
+            height: 23px;
+            line-height: 23px;
             margin-top: 8px;
             border-radius: 4px;
             color: #fff;
@@ -337,12 +416,16 @@ export default {
         width: 100%;
         height: 50px;
         border-top: 1px solid #ccc;
+        cursor: pointer;
         button {
           height: 40px;
           width: 50px;
           background: #ededed;
           color: #737373;
           border: 0;
+          font-size: 14px;
+          // text-align: right;
+          // letter-spacing: 3px;
           border-radius: 4px;
           margin: 20px 36px 0 23px;
           cursor: pointer;
@@ -368,6 +451,7 @@ export default {
     }
     .r {
       .list {
+        padding: 7px 24px 0;
         height: 460px;
         h5 {
           line-height: 23px;
@@ -379,8 +463,11 @@ export default {
         input {
           width: 265px;
           height: 39px;
-          border: 1px solid #999;
+          border: 1px solid #ccc;
           border-radius: 4px;
+          font-size: 14px;
+          color: rgb(121, 121, 121);
+          // font-weight: 600;
           text-indent: 10px;
           outline: none;
         }

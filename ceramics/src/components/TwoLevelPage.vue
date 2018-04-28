@@ -1,14 +1,14 @@
 <template>
-  <div class="two-level-page">
+  <div class="two-level-page" id="two_level_page">
     <head-page></head-page>
     <img class="close" src="../assets/close.png" @click="close" />
-    <div class="img-detail">
+    <div class="img-detail" id="img_detail">
       <div class="collection" @click="collection">收藏</div>
-      <img :src="imgSrc" alt="">
+      <img :src="imgSrc" />
     </div>
     <Enshrine v-if="isCollectionShow" :id="id" @enshrineClose="enshrineClose" />
     <div class="img_list" id="item">
-      <WaterFull :Images="imgs" :row="row" :picWidth="246" />
+      <WaterFull :Images="imgs" :row="row" :picWidth="246" @maxHeight="maxHeight" @imgId="imgId" />
     </div>
   </div>
 </template>
@@ -17,6 +17,7 @@
 import HeadPage from './assembly/Header'
 import Enshrine from './assembly/Enshrine'
 import WaterFull from './assembly/WaterFull'
+const PIC_WIDTH = 286
 export default {
   name: 'twolevelpage',
   data () {
@@ -30,13 +31,42 @@ export default {
     }
   },
   mounted () {
-    // console.log(this.$route.params.id)
-    this.id = this.$route.params.id
-    // this.data = this.$route.params.scrollH
     this.getData()
-    document.getElementById('item').style.width = this.row * 286 + 'px'
+    document.getElementById('item').style.width = this.row * PIC_WIDTH + 'px'
+    window.addEventListener('scroll', this.handleScroll)
+    this.clientChange()
+    window.addEventListener('resize', this.clientWidthChange)
   },
   methods: {
+    clientChange () {
+      let columnWidth = document.documentElement.clientWidth
+      this.row = Math.floor(columnWidth / PIC_WIDTH)
+      document.getElementById('item').style.width = this.row * PIC_WIDTH + 'px'
+      if (this.row > 7) {
+        this.row = 7
+      } else if (this.row <= 1) {
+        this.row = 1
+      }
+    },
+    clientWidthChange () {
+      this.clientChange()
+    },
+    handleScroll () {
+      let scroll = document.documentElement.scrollTop || document.body.scrollTop
+      let scrollH = document.documentElement.scrollHeight || document.body.scrollHeight
+      let clientH = document.documentElement.clientHeight || document.body.clientHeight
+      if (clientH + scroll === scrollH) {
+        this.getData()
+      }
+    },
+    imgId (id) {
+      this.id = id
+      this.$router.go({name: 'TwoLevelPage', query: {id: id}})
+    },
+    maxHeight (data) {
+      let h = document.getElementById('img_detail').offsetHeight
+      document.getElementById('two_level_page').style.height = data + h + 148 + 40 + 'px'
+    },
     collection () {
       this.isCollectionShow = true
     },
@@ -45,9 +75,10 @@ export default {
     },
     getData () {
       let that = this
+      this.id = this.$route.query.id
       that.$http.get('http://www.temaxd.com/Hooott/selCard.cz', {
         params: {
-          id: this.$route.params.id
+          id: this.id
         }
       }).then(res => {
         // console.log(JSON.parse(res.data))
@@ -93,8 +124,8 @@ export default {
     // height: 717px;
     margin: 0 auto;
     background: #fff;
-    border-radius: 18px;
-    padding: 23px 0 36px 0;
+    border-radius: 15px;
+    padding: 23px 0 40px 0;
     .collection {
       width: 80px;
       height: 40px;
