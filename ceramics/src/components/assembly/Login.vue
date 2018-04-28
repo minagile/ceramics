@@ -8,6 +8,9 @@
       <button @click="SignIn">登录</button>
       <a class="register" @click="toRegister">注册</a>
     </div>
+    <div class="right">
+      <div class="cover"></div>
+    </div>
   </div>
 </template>
 
@@ -71,6 +74,7 @@ export default {
 <style lang="less" scoped>
 .login {
   height: 100%;
+  // overflow: hidden;
   .content {
     float: right;
     width: 272px;
@@ -92,7 +96,7 @@ export default {
       padding-left: 10px;
       background: #fff;
       border: 0;
-      color: #ccc;
+      color: #666;
       border-radius: 4px;
       outline: none;
     }
@@ -108,18 +112,40 @@ export default {
       cursor: pointer;
       border: 0;
       outline: none;
+      &:hover {
+        background: rgb(182, 23, 23);
+      }
     }
     a {
       cursor: pointer;
     }
     .forget {
-      font-size: 14px;
+      font-size: 12px;
+      color: #666;
+      &:hover {
+        color: #333;
+      }
     }
     .register {
       cursor: pointer;
       font-size: 10px;
-      color: #ccc;
+      color: #666;
       text-decoration: underline;
+    }
+  }
+  .right{
+    width: 146px;
+    height: 100%;
+    background-image: url(../../assets/pic10.jpg);
+    background-size: cover;
+    position: relative;
+    .cover {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      top: 0;
+      right: 0;
+      background: rgba(255, 255, 255, 0.7);
     }
   }
 }

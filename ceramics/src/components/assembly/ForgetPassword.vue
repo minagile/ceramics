@@ -9,7 +9,7 @@
     <input type="password" v-model="password" placeholder="密码" />
     <input type="password" v-model="confirm" placeholder="确认密码" />
     <button @click="confirmChange">确认修改</button>
-    <div @click="backToLogin">返回登录</div>
+    <div class="bbb" @click="backToLogin">返回登录</div>
   </div>
 </template>
 
@@ -139,10 +139,11 @@ export default {
 <style lang="less" scoped>
 .forget_password {
   height: 100%;
+  background: rgba(255, 255, 255, 0.2);
   h2 {
-    height: 90px;
-    line-height: 120px;
-    color: #fff;
+    height: 60px;
+    line-height: 90px;
+    color: #333;
   }
   .code {
     width: 154px;
@@ -157,7 +158,10 @@ export default {
       height: 24px;
       line-height: 24px;
       margin: 6px 0;
-      background: red;
+      background: rgb(224, 27, 27);
+      &:hover {
+        background: rgb(182, 23, 23);
+      }
       border: 0;
       outline: none;
       color: #fff;
@@ -175,16 +179,26 @@ export default {
     border: 0;
     border-radius: 4px;
     margin: 6px auto;
+    color: #666;
     outline: none;
   }
   button {
     width: 100px;
     height: 24px;
     color: #fff;
-    background: red;
+    background: rgb(224, 27, 27);
+    &:hover {
+      background: rgb(182, 23, 23);
+    }
     border-radius: 4px;
     outline: none;
     cursor: pointer;
+  }
+  .bbb {
+    font-size: 12px;
+    cursor: pointer;
+    color: #666;
+    text-decoration: underline;
   }
 }
 </style>

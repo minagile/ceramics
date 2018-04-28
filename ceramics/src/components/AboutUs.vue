@@ -102,15 +102,19 @@ export default {
       img {
         width: 30px;
         float: left;
+        margin-right: 10px;
         cursor: pointer;
       }
       span {
         line-height: 30px;
+        color: #666;
       }
     }
     .swiper {
       width: 880px;
       height: 400px;
+      border-radius: 8px;
+      // overflow: hidden;
       // border: 1px solid #ccc;
       .swiper-container {
         width: 880px;

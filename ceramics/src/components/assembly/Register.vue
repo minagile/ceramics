@@ -10,12 +10,15 @@
           <button @click="userRegister">注册</button>
           <a class="to_login" @click="toLogin">登录</a>
         </div>
+        <div class="left">
+          <div class="cover"></div>
+        </div>
       </div>
     </div>
     <div class="popup" v-show="login">
       <login @userRegister="backToRegister" @forGet="forgetPass" @loginSuccess="successLogin"></login>
     </div>
-    <div class="popup" v-show="forget">
+    <div class="popup fo" v-show="forget">
       <ForgetPassword @confirm="showLogin"></ForgetPassword>
     </div>
   </div>
@@ -123,7 +126,7 @@ export default {
 .popup {
   width: 420px;
   height: 250px;
-  background: rgba(255, 255, 255, 0.6);
+  background: rgba(255, 255, 255, 0.7);
   position: relative;
   left: 50%;
   top: 50%;
@@ -131,10 +134,32 @@ export default {
   margin-left: -210px;
   border-radius: 10px;
   text-align: center;
+  overflow: hidden;
+  &.fo {
+    // background-image: url(../../assets/pic11.jpg);
+    background-size: cover;
+  }
   .user_register {
     height: 100%;
     .content {
       border-right: 2px solid rgba(0, 0, 0, 0.3);
+      float: left;
+    }
+    .left {
+      width: 146px;
+      height: 100%;
+      background-image: url(../../assets/pic10.jpg);
+      background-size: cover;
+      position: relative;
+      .cover {
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        top: 0;
+        right: 0;
+        background: rgba(255, 255, 255, 0.7);
+      }
+      float: right;
     }
   }
 }
@@ -157,7 +182,7 @@ export default {
     padding-left: 10px;
     background: #fff;
     border: 0;
-    color: #ccc;
+    color: #666;
     border-radius: 4px;
     outline: none;
   }
@@ -168,6 +193,9 @@ export default {
     height: 16px;
     font-size: 12px;
     background: rgb(224, 27, 27);
+    &:hover {
+      background: rgb(182, 23, 23);
+    }
     border-radius: 4px;
     color: #fff;
     cursor: pointer;
@@ -177,7 +205,7 @@ export default {
   .to_login {
     cursor: pointer;
     font-size: 10px;
-    color: #ccc;
+    color: #666;
     text-decoration: underline;
   }
 }

@@ -99,6 +99,13 @@ export default {
 
 <style lang="less" scoped>
 .terms-of-servics {
+  padding-bottom: 60px;
+  h1 {
+    color: #333;
+  }
+  p {
+    color: #666;
+  }
 }
 .header{
   height: 100px;
@@ -106,12 +113,17 @@ export default {
 }
 .main{
   width:60%;
-  height: 1700px;
-  margin:0 auto;
+  // height: 1700px;
+  padding-bottom:80px;
+  border-bottom: 1px solid #ccc;
+  margin:0 auto 50px;
+  h1 {
+    color: #333;
+  }
 }
 .main_title{
   width:300px;
-  border-bottom: 1px solid red;
+  border-bottom: 1px solid #ccc;
   margin-bottom: 50px;
 }
 .main_title h1{
@@ -123,10 +135,12 @@ export default {
 }
 .server_data h2{
   margin-bottom: 13px;
+  color: #333;
 }
 .server_data p{
   line-height: 22px;
   text-indent: 2em;
   margin-bottom: 4px;
+  color: #666;
 }
 </style>
