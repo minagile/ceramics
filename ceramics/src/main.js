@@ -4,7 +4,12 @@ import Vue from 'vue'
 import App from './App'
 import router from './router'
 import VueResource from 'vue-resource'
+import VueAwesomeSwiper from 'vue-awesome-swiper'
 
+// require styles
+import 'swiper/dist/css/swiper.css'
+
+Vue.use(VueAwesomeSwiper)
 Vue.use(VueResource)
 Vue.config.productionTip = false
 

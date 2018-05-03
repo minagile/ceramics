@@ -134,7 +134,18 @@ export default {
       // this.$router.push({
       //   name: 'HomePage'
       // })
-      history.go(-1)
+      let enter = JSON.parse(sessionStorage.getItem('enter'))
+      console.log(enter)
+      if (enter === true) {
+        this.$router.push({
+          name: 'PersonalCenter',
+          params: {
+            status: true
+          }
+        })
+      } else {
+        history.go(-1)
+      }
     }
   },
   beforeRouteLeave (to, from, next) {

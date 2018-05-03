@@ -125,9 +125,14 @@ export default {
         position: relative;
         z-index: 99;
         height: 100%;
-        width: 160px;
+        width: 180px;
         background: #fff;
-        padding: 0 10px;
+        div:last-of-type  a {
+          border: 0;
+        }
+        div:hover {
+          background: #eaeaea;
+        }
       }
       .arrow {
         position: absolute;
@@ -143,15 +148,14 @@ export default {
         left: 4px;
       }
       div {
-        height: 40px;
-        border-bottom: 1px solid #ccc;
         text-align: center;
         line-height: 40px;
         cursor: pointer;
-        &:last-of-type{
-          border: 0;
-        }
+        height: 40px;
         a {
+          display: block;
+          margin: 0 10px;
+          border-bottom: 1px solid #ccc;
           text-decoration: none;
           color: #666;
         }

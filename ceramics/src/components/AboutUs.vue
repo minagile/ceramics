@@ -90,6 +90,14 @@ export default {
 </script>
 
 <style lang="less" scoped>
+.swiper-pagination-bullet {
+  border: 2px solid #333;
+  opacity: 1;
+  background: rgba(0, 0, 0, 0);
+}
+.swiper-pagination-bullet-active {
+  background:  #333;
+}
 .about-us {
   padding-top: 80px;
   .body-page {
@@ -104,6 +112,11 @@ export default {
         float: left;
         margin-right: 10px;
         cursor: pointer;
+        transition: 1s;
+        &:hover {
+          transition: 1s;
+          transform: scale(1.2);
+        }
       }
       span {
         line-height: 30px;

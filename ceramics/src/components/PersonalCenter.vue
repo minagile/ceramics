@@ -58,11 +58,18 @@
             <div class="email">
               <input type="email" placeholder="Email" v-model="email" />
               <!-- 发送验证码 -->
-              <img src="../assets/send.png" @click="sendCode" />
-              <input type="text" placeholder="填写验证码" v-model="correctCode" />
+              <!-- <img src="../assets/send.png" @click="sendCode" /> -->
+              <div class="img" @click="sendCode"></div>
+              <input type="text" class="codeBox" id="email_code" placeholder="填写验证码" v-model="correctCode" />
             </div>
-            <!-- <div class="tit">手机号</div>
-            <div class="nickname"><input type="text" placeholder="手机号" v-model="nickname" /></div> -->
+            <div class="tit">手机号</div>
+            <div class="nickname">
+              <input type="text" placeholder="手机号" v-model="nickname" />
+              <!-- 发送验证码 -->
+              <!-- <img src="../assets/send.png" @click="" /> -->
+              <div class="img" @click="sendPhoneCode"></div>
+              <input type="text" class="codeBox" id="name_code" placeholder="填写验证码" v-model="correctPhoneCode" />
+            </div>
             <div class="tit">密码</div>
             <div class="password"><button @click="changePassword">更改密码</button></div>
             <div class="tit">性别</div>
@@ -78,7 +85,7 @@
                 name="avatar"
                 accept="image/gif,image/jpeg,image/jpg,image/png"
                 @change="changeImage($event)"
-                ref="avatarInput" />更换图片
+                ref="avatarInput" />更换头像
               </button>
             </div>
           </div>
@@ -163,29 +170,39 @@ export default {
       isPictureShow: false,
       foldName: '',
       imgList: [],
-      row: 6,
+      row: 3,
       email: '',
       nickname: '',
       sex: '男',
       correctCode: '',
-      getCode: ''
+      getCode: '',
+      correctPhoneCode: '',
+      getPhoneCode: ''
     }
   },
   mounted () {
+    // console.log(this.$route.params.status)
+    if (this.$route.params.status === true) {
+      this.isPictureShow = true
+      this.foldName = JSON.parse(sessionStorage.getItem('data')).foldName
+      this.imgList = JSON.parse(sessionStorage.getItem('data')).imgList
+    }
     this.getInfoData()
     this.getCollectionData()
-    // this.clientWidthChange()
-    document.getElementById('list_item').style.width = this.row * 221 + 'px'
     window.addEventListener('resize', this.clientWidthChange)
     // how many rows
     let columnWidth = document.documentElement.clientWidth
-    let foldNum = Math.floor((columnWidth - 372) / 282)
-    if (columnWidth - 372 > 1000) {
+    let WaterFullRow = Math.floor((columnWidth - 500) / 221)
+    // console.log(WaterFullRow)
+    this.row = WaterFullRow
+    document.getElementById('list_item').style.width = this.row * 221 + 'px'
+    let foldNum = Math.floor((columnWidth - 372) / 302)
+    if (columnWidth - 372 > 906) {
       document.getElementById('big_box').style.width = columnWidth - 372 + 'px'
-      document.getElementById('first_enter').style.width = foldNum * 282 + 'px'
+      document.getElementById('first_enter').style.width = foldNum * 302 + 'px'
     } else {
       document.getElementById('big_box').style.width = 990 + 'px'
-      document.getElementById('first_enter').style.width = 848 + 'px'
+      document.getElementById('first_enter').style.width = 906 + 'px'
     }
   },
   methods: {
@@ -194,17 +211,26 @@ export default {
     },
     clientWidthChange () {
       let columnWidth = document.documentElement.clientWidth
-      let foldNum = Math.floor((columnWidth - 357) / 282)
-      if (columnWidth - 357 >= 1000) {
-        document.getElementById('big_box').style.width = columnWidth - 357 + 'px'
-        document.getElementById('first_enter').style.width = foldNum * 282 + 'px'
+      let foldNum = Math.floor((columnWidth - 372) / 302)
+      let WaterFullRow = Math.floor((columnWidth - 428) / 221)
+      // console.log(WaterFullRow)
+      if (WaterFullRow < 3) {
+        WaterFullRow = 3
+      }
+      this.row = WaterFullRow
+      document.getElementById('list_item').style.width = this.row * 221 + 'px'
+      if (columnWidth - 372 >= 906) {
+        document.getElementById('big_box').style.width = columnWidth - 372 + 'px'
+        document.getElementById('first_enter').style.width = foldNum * 302 + 'px'
       } else {
         document.getElementById('big_box').style.width = 990 + 'px'
-        document.getElementById('first_enter').style.width = 848 + 'px'
+        document.getElementById('first_enter').style.width = 906 + 'px'
       }
     },
     // 发送验证码
     sendCode () {
+      document.getElementById('email_code').style.width = '100px'
+      document.getElementById('email_code').style.transition = '0.5s'
       let that = this
       let config = { headers: { 'Content-Type': 'multipart/form-data' } }
       if (!(/^[A-Za-z0-9\u4e00-\u9fa5]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/.test(this.email))) {
@@ -213,9 +239,22 @@ export default {
         that.$http.post('http://www.temaxd.com/Hooott/sendEmail.cz?email=' + this.email, {}, config).then(res => {
           let status = JSON.parse(res.data)
           console.log(status[1].RAND)
-          // this.timeOut = true
-          // this.countDown(60, ev.path[0])
           this.getCode = status[1].RAND
+        })
+      }
+    },
+    sendPhoneCode () {
+      document.getElementById('name_code').style.width = '100px'
+      document.getElementById('name_code').style.transition = '0.5s'
+      let that = this
+      let config = { headers: { 'Content-Type': 'multipart/form-data' } }
+      if (!(/^1(3|4|5|7|8)\d{9}$/.test(this.nickname))) {
+        alert('手机号码有误，请重填')
+      } else {
+        that.$http.post('http://www.temaxd.com/Hooott/sendPhone.cz?phone=' + this.nickname, {}, config).then(res => {
+          let status = JSON.parse(res.data)
+          console.log(status)
+          this.getPhoneCode = status.RAND
         })
       }
     },
@@ -225,37 +264,73 @@ export default {
     },
     // 保存修改设置
     saveChange () {
-      let that = this
-      let config = { emulateJSON: true }
-      if (this.user.userEmail === 'null') {
+      if (this.email === 'null') {
         this.email = 0
       } else {
         this.email = this.email
       }
-      if (this.user.userPhone === 'null') {
-        this.user.userPhone = 0
+      if (this.nickname === 'null') {
+        this.nickname = 0
       } else {
-        this.user.userPhone = this.user.userPhone
+        this.nickname = this.nickname
       }
-      if (this.getCode === this.correctCode) {
-        that.$http.post('http://www.temaxd.com/Hooott/updateUserInfo.cz', {
-          userEmail: this.email,
-          userPhone: this.user.userPhone,
-          userSex: this.sex,
-          userId: JSON.parse(localStorage.getItem('token'))
-        }, config).then(res => {
-          console.log(res.data)
-          history.go(0)
-        })
+      if (this.email !== this.user.userEmail) {
+        if (this.correctCode === '' || this.correctCode !== this.getCode) {
+          alert('请填写正确的验证码')
+        } else {
+          if (this.nickname !== this.user.userPhone) {
+            if (this.getPhoneCode !== this.correctPhoneCode || this.correctPhoneCode === '') {
+              alert('请填写正确的验证码')
+            } else {
+              this.changeUserInfo()
+            }
+          } else {
+            if (this.sex !== this.user.userSex) {
+              this.changeUserInfo()
+            } else {
+              // history.go(0)
+              this.changeUserInfo()
+            }
+          }
+        }
       } else {
-        alert('验证码错误')
+        if (this.nickname !== this.user.userPhone) {
+          if (this.getPhoneCode !== this.correctPhoneCode || this.correctPhoneCode === '') {
+            alert('请填写正确的验证码')
+          } else {
+            this.changeUserInfo()
+          }
+        } else {
+          if (this.sex !== this.user.userSex) {
+            this.changeUserInfo()
+          } else {
+            // history.go(0)
+            this.changeUserInfo()
+          }
+        }
       }
+    },
+    changeUserInfo () {
+      let that = this
+      let config = { emulateJSON: true }
+      console.log(this.email)
+      that.$http.post('http://www.temaxd.com/Hooott/updateUserInfo.cz', {
+        userEmail: this.email,
+        userPhone: this.nickname,
+        userSex: this.sex,
+        userId: JSON.parse(localStorage.getItem('token'))
+      }, config).then(res => {
+        console.log(res.data)
+        history.go(0)
+      })
     },
     back () {
       this.isPictureShow = false
+      sessionStorage.setItem('enter', false)
     },
     // 展示文件夹里的图片
     showFolderImages (id, name) {
+      sessionStorage.setItem('enter', true)
       this.isPictureShow = true
       this.imgList = []
       this.foldName = name
@@ -277,6 +352,12 @@ export default {
             // console.log(v)
             this.imgList.push({ossImage: JSON.parse(v).ossImage, id: JSON.parse(v).cardId})
           })
+          // console.log(this.imgList)
+          let data = {
+            foldName: name,
+            imgList: this.imgList
+          }
+          sessionStorage.setItem('data', JSON.stringify(data))
         }
       })
     },
@@ -383,36 +464,6 @@ export default {
         console.log(err)
       })
     },
-    // 瀑布流--->文件夹
-    folderImgList (data) {
-      data.forEach((x, y) => {
-        x.list.forEach((m, n) => {
-          loadImage(m.ossImage).then(img => {
-            this.$nextTick(() => {
-              let list = this.$refs.picImagesList
-              // console.log(list)
-              let arr = []
-              list.forEach(i => {
-                // console.log(i.children)
-                for (var j = 0; j < i.children.length; j++) {
-                  if (j < 4) {
-                    i.children[j].style.top = 0
-                    i.children[j].style.left = 61 * j + 'px'
-                    arr.push(i.children[j].offsetHeight)
-                  } else {
-                    let iMinH = Math.min(...arr)
-                    let iMinIndex = arr.indexOf(iMinH)
-                    i.children[j].style.left = iMinIndex * 61 + 'px'
-                    i.children[j].style.top = iMinH + 'px'
-                    arr[iMinIndex] = iMinH + i.children[j].offsetHeight
-                  }
-                }
-              })
-            })
-          }).catch(err => console.log(err))
-        })
-      })
-    },
     // 获取个人信息
     getInfoData () {
       let that = this
@@ -421,9 +472,19 @@ export default {
           userId: JSON.parse(localStorage.getItem('token'))
         }
       }).then(res => {
-        // console.log(JSON.parse(res.data))
+        console.log(JSON.parse(res.data))
         this.user = JSON.parse(res.data)
-        this.email = this.user.userEmail
+        if (this.user.userEmail === 'null') {
+          this.email = 'Email'
+        } else {
+          this.email = this.user.userEmail
+        }
+        if (this.user.userPhone === 'null') {
+          this.nickname = 'phone'
+        } else {
+          // console.log(this.user.userPhone)
+          this.nickname = this.user.userPhone.slice(0, 3) + '****' + this.user.userPhone.slice(7, 11)
+        }
         this.avatar = this.user.userAvatar
         this.sex = this.user.userSex
       })
@@ -536,14 +597,6 @@ export default {
     WaterFull
   }
 }
-function loadImage (url) {
-  return new Promise((resolve, reject) => {
-    let img = new Image()
-    img.onload = () => resolve(img)
-    img.onerror = reject
-    img.src = url
-  })
-}
 </script>
 
 <style lang="less" scoped>
@@ -570,6 +623,11 @@ function loadImage (url) {
         display: block;
         float: left;
         margin-right: 10px;
+        transition: 1s;
+        &:hover {
+          transition: 1s;
+          transform: scale(1.2);
+        }
       }
       span {
         line-height: 30px;
@@ -639,20 +697,21 @@ function loadImage (url) {
   .first-enter {
     width: 848px;
     padding: 20px 10px 0;
-    display: flex;
-    flex-wrap: wrap;
+    // display: flex;
+    // flex-wrap: wrap;
     margin: 0 auto 70px;
     justify-content: space-between;
     // border: 1px solid #ccc;
+    overflow: hidden;
     .r {
       width: 244px;
-      // height: 162px;
-      margin-bottom: 50px;
-      // border: 1px solid #ccc;
+      float: left;
+      margin:0 29px 50px;
       .pic {
         width: 100%;
         height: 162px;
         background-size: cover;
+        background-position: center center;
         margin-bottom: 12px;
         border-radius: 8px;
         cursor: pointer;
@@ -666,16 +725,6 @@ function loadImage (url) {
     }
     .folder {
       position: relative;
-      // .pic {
-      //   background: #e6e6e6;
-      //   position: relative;
-      //   overflow: hidden;
-      //   img {
-      //     position: absolute;
-      //     width: 61px;
-      //     // display: block;
-      //   }
-      // }
       .cover {
         &:hover {
           transition: 1s;
@@ -724,6 +773,11 @@ function loadImage (url) {
         float: left;
         margin-right: 10px;
         cursor: pointer;
+        transition: 1s;
+        &:hover {
+          transition: 1s;
+          transform: scale(1.2);
+        }
       }
     }
     .img-list {
@@ -763,23 +817,57 @@ function loadImage (url) {
       .email,.nickname {
         height: 51px;
         margin-bottom: 30px;
+        position: relative;
         input {
           border: 0;
-          height: 51px;
-          width: 338px;
+          height: 42px;
+          width: 226px;
           background: #e6e6e6;
           color: #888;
           font-size: 14px;
-          border-radius: 6px;
+          border-radius: 2px;
           text-indent: 10px;
           outline: none;
+          &.codeBox {
+            &::-webkit-input-placeholder{
+              color: #999;
+              font-size: 12px;
+            }
+            &::-moz-placeholder{
+              color: #999;
+              font-size: 12px;
+            }
+            &:-moz-placeholder{
+              color: #999;
+              font-size: 12px;
+            }
+            &:-ms-input-placeholder{
+              color: #999;
+              font-size: 12px;
+            }
+            // width: 100px;
+            width: 0;
+            margin-left: 80px;
+            height: 30px;
+            color: #999;
+            :-moz-placeholder {
+              color: #999;
+            }
+          }
         }
-        img {
+        .img {
           width: 30px;
-          position: relative;
-          top: 10px;
-          margin-left: 20px;
+          height: 30px;
+          position: absolute;
+          top: 6px;
+          left: 246px;
+          // margin-left: 20px;
+          background-image: url(../assets/send.png);
+          background-size: cover;
           cursor: pointer;
+          &:hover {
+            background-image: url(../assets/send2.png);
+          }
         }
       }
       .password {
@@ -794,12 +882,15 @@ function loadImage (url) {
           cursor: pointer;
           outline: none;
           margin: 14px 0;
+          &:hover {
+            background: rgb(197, 197, 197);
+          }
         }
       }
       .sex {
         input {
-          width: 24px;
-          height: 24px;
+          width: 21px;
+          height: 16px;
           margin: 7px 9px 27px 0;
         }
       }
@@ -825,6 +916,9 @@ function loadImage (url) {
           outline: none;
           margin: 50px 0 0 20px;
           position: relative;
+          &:hover {
+            background: rgb(197, 197, 197);
+          }
           input {
             position: absolute;
             width: 100%;
@@ -850,6 +944,11 @@ function loadImage (url) {
       text-align: center;
       margin: 30px auto 0;
       cursor: pointer;
+      transition: 1s;
+      &:hover {
+        background: #b1161b;
+        transition: 1s;
+      }
     }
   }
 }
@@ -910,6 +1009,11 @@ function loadImage (url) {
         margin-right: 20px;
         cursor: pointer;
         outline: none;
+        transition: 1s;
+        &:hover {
+          background: #d6d5d5;
+          transition: 1s;
+        }
       }
     }
   }

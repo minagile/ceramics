@@ -1,17 +1,18 @@
 <template>
   <div class="home-page" id="home_page">
-    <head-page></head-page>
-    <div class="first-page" id="items" >
-      <!-- <WaterFull :Images="data" :row="row" :picWidth="246" @imgId="imgId" /> -->
-      <WaterFull :Images="data" :row="row" :picWidth="246" @notoken="notoken" />
-      <!-- <div class="popup" v-for="(item, index) in data" :key="index" ref="imgList">
-        <img :src="'https://spider-x.oss-cn-shanghai.aliyuncs.com/CeramicCard/' + item.ossImage.split('[')[1].split(']')[0]" />
-        <div class="cover" @click="imgLevel(item.id)"></div>
-      </div> -->
+    <head-page :style="isScroll"></head-page>
+    <div class="pic" id="banner" v-show="scrollShow">
+      <div class="banner_cover">
+        <h2>HOOOT.T</h2>
+        <div class="p">
+          <p>我想仔细聆听故事</p>
+          <p>仔细地创造一个围绕你我生活的陶瓷空间。</p>
+        </div>
+      </div>
     </div>
-    <!-- <div class="two_level" v-if="isLevelShow">
-      <TwoPageLevel :id="id" @levelClose="levelClose"/>
-    </div> -->
+    <div class="first-page" id="items" >
+      <WaterFull :Images="data" :row="row" :picWidth="246" @notoken="notoken" />
+    </div>
     <div id="back_to_top" @click="backToTop">
       <img src="../assets/back_to_top.png" />
     </div>
@@ -35,19 +36,11 @@ export default {
       time: 0,
       hasToken: false,
       isLevelShow: false,
-      id: ''
+      id: '',
+      isScroll: { top: '-100px', transition: '1s' },
+      scrollShow: false
     }
   },
-  // beforeRouteEnter (to, from, next) {
-  //   // 路由导航钩子，此时还不能获取组件实例 `this`，所以无法在data中定义变量（利用vm除外）
-  //   // 参考 https://router.vuejs.org/zh-cn/advanced/navigation-guards.html
-  //   // 所以，利用路由元信息中的meta字段设置变量，方便在各个位置获取。这就是为什么在meta中定义isBack
-  //   // 参考 https://router.vuejs.org/zh-cn/advanced/meta.html
-  //   if (from.name === 'TwoLevelPage') {
-  //     to.meta.isBack = true
-  //   }
-  //   next()
-  // },
   beforeRouteEnter (to, from, next) {
     next(vm => {
       window.addEventListener('resize', vm.clientWidthChange)
@@ -55,12 +48,20 @@ export default {
     })
   },
   mounted () {
-    // console.log('123213')
     this.clientChange()
     window.addEventListener('resize', this.clientWidthChange)
     document.getElementById('items').style.width = this.row * PIC_WIDTH - 20 + 'px'
     this.getData()
     window.addEventListener('scroll', this.handleScroll)
+    let token = localStorage.getItem('token')
+    if (token === null) {
+      this.scrollShow = true
+      this.isScroll = { top: '-100px', transition: '1s' }
+    } else {
+      this.scrollShow = false
+      // this.getData()
+      this.isScroll = { top: '0', transition: '1s' }
+    }
   },
   methods: {
     notoken () {
@@ -70,9 +71,7 @@ export default {
       this.hasToken = false
     },
     backToTop () {
-      // window.scrollTo(0, 0)
       var scrollToptimer = setInterval(function () {
-        // console.log('定时循环回到顶部')
         var top = document.body.scrollTop || document.documentElement.scrollTop
         var speed = top / 20
         if (document.body.scrollTop !== 0) {
@@ -92,6 +91,13 @@ export default {
       let scroll = document.documentElement.scrollTop || document.body.scrollTop
       let scrollH = document.documentElement.scrollHeight || document.body.scrollHeight
       let clientH = document.documentElement.clientHeight || document.body.clientHeight
+      let token = localStorage.getItem('token')
+      if (token === null) {
+        this.isScroll = { top: '0', transition: '1s' }
+        if (scroll === 0) {
+          this.isScroll = { top: '-100px', transition: '1s' }
+        }
+      }
       if (scroll >= clientH) {
         document.getElementById('back_to_top').style.bottom = '33px'
         document.getElementById('back_to_top').style.transition = '1s'
@@ -107,19 +113,19 @@ export default {
             this.hasToken = true
           } else {
             this.hasToken = false
-            // console.log('handleScroll')
             this.getData()
           }
         } else {
           this.getData()
-          // console.log('handleScroll')
         }
       }
     },
     clientChange () {
       let columnWidth = document.documentElement.clientWidth
+      let clientHeight = document.documentElement.clientHeight
       this.row = Math.floor(columnWidth / PIC_WIDTH)
       document.getElementById('items').style.width = this.row * PIC_WIDTH + 'px'
+      document.getElementById('banner').style.height = clientHeight + 'px'
       if (this.row > 7) {
         this.row = 7
       } else if (this.row <= 1) {
@@ -132,8 +138,6 @@ export default {
     getData () {
       let that = this
       that.$http.get('http://www.temaxd.com/Hooott/cardJson.cz').then(res => {
-        // console.log(res.data)
-        // console.log(JSON.parse(res.data))
         JSON.parse(res.data).forEach(v => {
           let ImgSrc = 'https://spider-x.oss-cn-shanghai.aliyuncs.com/CeramicCard/' + v.ossImage.split('[')[1].split(']')[0]
           this.data.push({ossImage: ImgSrc, id: v.id})
@@ -142,7 +146,6 @@ export default {
     }
   },
   beforeRouteLeave (to, from, next) {
-    // console.log('leave')
     window.removeEventListener('scroll', this.handleScroll)
     window.removeEventListener('resize', this.clientWidthChange)
     next()
@@ -157,12 +160,55 @@ export default {
 </script>
 
 <style lang="less" scoped>
+// @font-face {
+//   font-family: 'myFirstFont';
+//   src: url(../assets/font/HYQiHei-30S.otf);
+// }
 .home-page {
-  padding-top: 120px;
-  min-height: 1000px;
+  // padding-top: 120px;
+  min-height: 2000px;
+  .pic {
+    width: 100%;
+    background-image: url('../assets/home_pic.jpeg');
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center center;
+    margin-bottom: 120px;
+    position: relative;
+    .banner_cover {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+      background: rgba(0, 0, 0, 0.4);
+      h2 {
+        color: #fff;
+        text-align: center;
+        font-size: 50px;
+        font-weight: 320;
+        padding: 20px 0 0 0;
+      }
+      .p {
+        position: absolute;
+        top: 40%;
+        width: 100%;
+        p {
+          color: #fff;
+          text-align: center;
+          font-size: 50px;
+          // font-family: '汉仪旗黑';
+          left: 184px;
+          // font-family: 'myFirstFont';
+          // font-weight: 320;
+          // padding: 20px 0 0 0;
+        }
+      }
+    }
+  }
   .first-page {
     // width: 1200px;
-    margin: 0 auto;
+    margin: 120px auto;
     position: relative;
     .popup {
       position: absolute;
@@ -215,6 +261,9 @@ export default {
     cursor: pointer;
     img {
       width: 100%;
+    }
+    &:hover {
+      transform: scale(1.2);
     }
   }
 }
