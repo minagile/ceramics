@@ -60,7 +60,7 @@ export default {
             if (!(/^1(3|4|5|7|8)\d{9}$/.test(this.user))) {
               alert('手机号码有误，请重填')
             } else {
-              that.$http.post('http://www.temaxd.com/Hooott/sendPhone.cz?phone=' + this.user, {}, config).then(res => {
+              that.$http.post('http://www.hooott.com/sendPhone.cz?phone=' + this.user, {}, config).then(res => {
                 let status = JSON.parse(res.data)
                 // console.log(status)
                 this.timeOut = true
@@ -73,7 +73,7 @@ export default {
             if (!(/^[A-Za-z0-9\u4e00-\u9fa5]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/.test(this.user))) {
               alert('邮箱有误，请重填')
             } else {
-              that.$http.post('http://www.temaxd.com/Hooott/sendEmail.cz?email=' + this.user, {}, config).then(res => {
+              that.$http.post('http://www.hooott.com/sendEmail.cz?email=' + this.user, {}, config).then(res => {
                 let status = JSON.parse(res.data)
                 // console.log(status)
                 this.timeOut = true
@@ -98,7 +98,7 @@ export default {
             if (this.verification === this.data) {
               let that = this
               let config = { headers: { 'Content-Type': 'multipart/form-data' } }
-              that.$http.post('http://www.temaxd.com/Hooott/forgetUser.cz?account=' + this.user + '&password=' + this.password, {}, config).then(res => {
+              that.$http.post('http://www.hooott.com/forgetUser.cz?account=' + this.user + '&password=' + this.password, {}, config).then(res => {
                 let change = JSON.parse(res.data)
                 console.log(change)
                 if (change.CODE === '200') {
@@ -116,7 +116,7 @@ export default {
             if (this.verification === this.data) {
               let that = this
               let config = { headers: { 'Content-Type': 'multipart/form-data' } }
-              that.$http.post('http://www.temaxd.com/Hooott/forgetUser.cz?account=' + this.user + '&password=' + this.password, {}, config).then(res => {
+              that.$http.post('http://www.hooott.com/forgetUser.cz?account=' + this.user + '&password=' + this.password, {}, config).then(res => {
                 let change = JSON.parse(res.data)
                 if (change.CODE === '200') {
                   console.log(change.MESSAGE)

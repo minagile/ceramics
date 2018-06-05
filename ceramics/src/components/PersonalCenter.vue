@@ -236,7 +236,7 @@ export default {
       if (!(/^[A-Za-z0-9\u4e00-\u9fa5]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/.test(this.email))) {
         alert('邮箱有误，请重填')
       } else {
-        that.$http.post('http://www.temaxd.com/Hooott/sendEmail.cz?email=' + this.email, {}, config).then(res => {
+        that.$http.post('http://www.hooott.com/sendEmail.cz?email=' + this.email, {}, config).then(res => {
           let status = JSON.parse(res.data)
           console.log(status[1].RAND)
           this.getCode = status[1].RAND
@@ -251,7 +251,7 @@ export default {
       if (!(/^1(3|4|5|7|8)\d{9}$/.test(this.nickname))) {
         alert('手机号码有误，请重填')
       } else {
-        that.$http.post('http://www.temaxd.com/Hooott/sendPhone.cz?phone=' + this.nickname, {}, config).then(res => {
+        that.$http.post('http://www.hooott.com/sendPhone.cz?phone=' + this.nickname, {}, config).then(res => {
           let status = JSON.parse(res.data)
           console.log(status)
           this.getPhoneCode = status.RAND
@@ -314,7 +314,7 @@ export default {
       let that = this
       let config = { emulateJSON: true }
       console.log(this.email)
-      that.$http.post('http://www.temaxd.com/Hooott/updateUserInfo.cz', {
+      that.$http.post('http://www.hooott.com/updateUserInfo.cz', {
         userEmail: this.email,
         userPhone: this.nickname,
         userSex: this.sex,
@@ -335,7 +335,7 @@ export default {
       this.imgList = []
       this.foldName = name
       let that = this
-      that.$http.get('http://www.temaxd.com/Hooott/folderCardAll.cz', {
+      that.$http.get('http://www.hooott.com/folderCardAll.cz', {
         params: {
           folderId: id
         }
@@ -364,7 +364,7 @@ export default {
     // 获取收藏的数据
     getCollectionData () {
       let that = this
-      that.$http.get('http://www.temaxd.com/Hooott/folderUserAll.cz', {
+      that.$http.get('http://www.hooott.com/folderUserAll.cz', {
         params: {
           userId: JSON.parse(localStorage.getItem('token'))
         }
@@ -373,7 +373,7 @@ export default {
         let list = res.data.split('[')[1].split(']')[0]
         if (list.indexOf(',') === -1) {
           this.collectionList.push(JSON.parse(list))
-          that.$http.get('http://www.temaxd.com/Hooott/folderCardAll.cz', {
+          that.$http.get('http://www.hooott.com/folderCardAll.cz', {
             params: {
               folderId: JSON.parse(list).folderId
             }
@@ -414,7 +414,7 @@ export default {
             if (k !== 0) {
               v = '{' + v
             }
-            that.$http.get('http://www.temaxd.com/Hooott/folderCardAll.cz', {
+            that.$http.get('http://www.hooott.com/folderCardAll.cz', {
               params: {
                 folderId: JSON.parse(v).folderId
               }
@@ -467,7 +467,7 @@ export default {
     // 获取个人信息
     getInfoData () {
       let that = this
-      that.$http.get('http://www.temaxd.com/Hooott/getUser.cz', {
+      that.$http.get('http://www.hooott.com/getUser.cz', {
         params: {
           userId: JSON.parse(localStorage.getItem('token'))
         }
@@ -503,12 +503,12 @@ export default {
         this.user.userAvatar = 0
       }
       image.append('file', file)
-      that.$http.post('http://www.temaxd.com/Hooott/uploadUserOss.cz', image, {
+      that.$http.post('http://www.hooott.com/uploadUserOss.cz', image, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
       }).then(res => {
-        that.$http.post('http://www.temaxd.com/Hooott/avatarUser.cz', {
+        that.$http.post('http://www.hooott.com/avatarUser.cz', {
           oldAvatar: this.user.userAvatar,
           ossType: file.type.split('/')[1],
           userId: this.user.userId,
@@ -539,7 +539,7 @@ export default {
     // 创建新收藏夹
     build () {
       let that = this
-      that.$http.get('http://www.temaxd.com/Hooott/addFolder.cz', {
+      that.$http.get('http://www.hooott.com/addFolder.cz', {
         params: {
           userId: JSON.parse(localStorage.getItem('token')),
           folderName: this.folderName
@@ -576,7 +576,7 @@ export default {
     confirmChange () {
       let that = this
       let config = { headers: { 'Content-Type': 'multipart/form-data' } }
-      that.$http.post('http://www.temaxd.com/Hooott/updateUser.cz?account=' + this.user.userPhone + '&oldPwd=' + this.oldPw + '&password=' + this.newPw, {}, config).then(res => {
+      that.$http.post('http://www.hooott.com/updateUser.cz?account=' + this.user.userPhone + '&oldPwd=' + this.oldPw + '&password=' + this.newPw, {}, config).then(res => {
         // console.log(res)
         let data = JSON.parse(res.data)
         if (data[0].CODE === '200') {

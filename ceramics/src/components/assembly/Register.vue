@@ -70,7 +70,7 @@ export default {
       if (this.password === this.confirmPassword) {
         let that = this
         let config = { headers: { 'Content-Type': 'multipart/form-data' } }
-        that.$http.post('http://www.temaxd.com/Hooott/registerUser.cz?account=' + this.userPhone + '&password=' + this.password, {}, config).then(res => {
+        that.$http.post('http://www.hooott.com/registerUser.cz?account=' + this.userPhone + '&password=' + this.password, {}, config).then(res => {
           let status = JSON.parse(res.data)
           if (status.CODE === '200') {
             this.register = false

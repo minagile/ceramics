@@ -43,7 +43,7 @@ export default {
     },
     getData () {
       let that = this
-      that.$http.get('http://www.temaxd.com/Hooott/selCard.cz', {
+      that.$http.get('http://www.hooott.com/selCard.cz', {
         params: {
           id: this.id
         }
@@ -51,7 +51,7 @@ export default {
         // console.log(JSON.parse(res.data))
         this.imgSrc = 'https://spider-x.oss-cn-shanghai.aliyuncs.com/CeramicCard/' + JSON.parse(res.data).ossImage
       })
-      that.$http.get('http://www.temaxd.com/Hooott/cardJson.cz').then(res => {
+      that.$http.get('http://www.hooott.com/cardJson.cz').then(res => {
         JSON.parse(res.data).forEach(v => {
           let ImgSrc = 'https://spider-x.oss-cn-shanghai.aliyuncs.com/CeramicCard/' + v.ossImage.split('[')[1].split(']')[0]
           this.imgs.push({ossImage: ImgSrc, id: v.id})

@@ -6,7 +6,7 @@ import PersonalCenter from '@/components/PersonalCenter'
 import AboutUS from '@/components/AboutUS'
 import ServerTerms from '@/components/ServerTerms'
 import TwoLevelPage from '@/components/TwoLevelPage'
-import UserTwo from '@/components/UserTwo'
+// import UserTwo from '@/components/UserTwo'
 import VueAwesomeSwiper from 'vue-awesome-swiper'
 
 // require styles
@@ -17,7 +17,7 @@ Vue.use(VueAwesomeSwiper)
 Vue.use(Router)
 
 export default new Router({
-  mode: 'history',
+  // mode: 'history',
   scrollBehavior (to, from, savedPosition) {
     if (savedPosition) {
       return savedPosition
@@ -48,15 +48,15 @@ export default new Router({
         isBack: false
       }
     },
-    {
-      path: '/usertwo',
-      name: 'UserTwo',
-      component: UserTwo,
-      meta: {
-        keepAlive: false,
-        isBack: false
-      }
-    },
+    // {
+    //   path: '/usertwo',
+    //   name: 'UserTwo',
+    //   component: UserTwo,
+    //   meta: {
+    //     keepAlive: false,
+    //     isBack: false
+    //   }
+    // },
     {
       path: '/he',
       name: 'HelloWorld',

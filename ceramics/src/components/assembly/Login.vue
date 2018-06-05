@@ -49,7 +49,7 @@ export default {
     passwordAndConfirm () {
       let that = this
       let config = { headers: { 'Content-Type': 'multipart/form-data' } }
-      that.$http.post('http://www.temaxd.com/Hooott/userLogin.cz?account=' + this.user + '&password=' + this.password, {}, config).then(res => {
+      that.$http.post('http://www.hooott.com/userLogin.cz?account=' + this.user + '&password=' + this.password, {}, config).then(res => {
         let status = JSON.parse(res.data)
         // console.log(status)
         if (status.CODE === '200') {
